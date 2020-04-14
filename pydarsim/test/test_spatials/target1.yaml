@@ -1,0 +1,31 @@
+info:
+    name: Target
+
+initial:
+    start_time: 0.0
+    stop_time: 400.0
+    east: 0.0
+    north: 185200.0
+    up: 0.0
+    heading: 180.0
+    pitch_angle: 0.0
+    speed: 200.0
+
+parameters:
+    update_rate: 1.0
+    max_lateral_gs: 3.0
+    max_vertical_gs: 3.0
+    max_gs: 1.0
+    accel_time_const: 0.25
+
+maneuvers:
+    1:
+        time: 100.0
+        final_speed: 300.0
+    2:
+        time: 200.0
+        final_heading: 0.0
+        final_pitch_angle: -22.5
+    #3:
+    #    time: 300.0
+    #    final_pitch_angle: -45.0

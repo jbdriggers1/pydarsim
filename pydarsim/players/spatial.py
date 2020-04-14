@@ -10,16 +10,22 @@ import numpy as np
 from numpy import deg2rad as d2r
 from numpy import rad2deg as r2d
 from pandas import DataFrame
+from copy import deepcopy
 
 from pydarsim.support.tools import load_yaml, map_pi_to_pi, map_0_to_2pi, makedir
 from pydarsim.support import xfrm
+from pydarsim.support.spatial_state import SpatialState
 
+from pdb import set_trace
 
 class Spatial(object):
     '''
     Class for generating simple spatial trajectories with parameters defined in a
     yaml configuration file. Supported maneuvers are simple heading change, speedup,
     and pitch maneuvers.
+    
+    Issues:
+        Check github for issues, there any many
     '''
     
     spatial_num = 0
@@ -47,8 +53,8 @@ class Spatial(object):
         max_speed = states.speed.max()
         min_speed = states.speed.min()
         max_gs = max((states.east_accel**2 + states.north_accel**2 + states.up_accel**2)**0.5) / 9.81
-        min_heading, max_heading = r2d(states.heading.min()), r2d(states.heading.max())
-        min_pitch, max_pitch = r2d(states.pitch_angle.min()), r2d(states.pitch_angle.max())
+        min_heading, max_heading = r2d(states.yaw.min()), r2d(states.yaw.max())
+        min_pitch, max_pitch = r2d(states.pitch.min()), r2d(states.pitch.max())
         min_east, max_east = states.east.min(), states.east.max()
         min_north, max_north = states.north.min(), states.north.max()
         min_up, max_up = states.up.min(), states.up.max()
@@ -140,12 +146,14 @@ class Spatial(object):
         self.start_time = self.init_params['start_time']
         self.stop_time = self.init_params['stop_time']
         self.update_rate = self.kinematic_params['update_rate']  # update period in seconds
-        self.sample_times = np.arange(self.start_time, self.stop_time+self.update_rate, self.update_rate)
+        self.sample_times = np.arange(self.start_time, self.stop_time+self.update_rate, 0.005)
+        self.report_times = np.arange(self.start_time, self.stop_time+self.update_rate, self.update_rate)
         
         # unpack max gs info
         self.max_gs = self.kinematic_params['max_gs']
         self.max_lat_gs = self.kinematic_params['max_lateral_gs']
         self.max_vert_gs = self.kinematic_params['max_vertical_gs']
+        self.accel_time_const = self.kinematic_params['accel_time_const'] 
         
         # get initial position
         east = self.init_params['east']
@@ -175,15 +183,20 @@ class Spatial(object):
         # mark maneuvers an incomplete
         for man_id in self.maneuvers:
             self.maneuvers[man_id]['finished'] = False
+            self.maneuvers[man_id]['finished_time'] = np.inf
         
         # fill in current-state variables
-        self.time = self.start_time
-        self.state = self.initial_state
-        self.yaw_rate = self.initial_yaw_rate
-        self.pitch_rate = self.initial_pitch_rate
-        self.speed = self.initial_speed
-        self.heading = self.initial_heading
-        self.pitch_angle = self.initial_pitch_angle
+        self.State = SpatialState()
+        self.State.time = self.start_time
+        self.State.state = self.initial_state
+        self.State.yaw_rate = self.initial_yaw_rate
+        self.State.pitch_rate = self.initial_pitch_rate
+        self.State.speed = self.initial_speed
+        self.State.yaw = self.initial_heading
+        self.State.pitch = self.initial_pitch_angle
+        self.State.axial_accel = 0.0
+        self.State.lateral_accel = 0.0
+        self.State.vertical_accel = 0.0
         
         self.spatial_states = []  # where generated spatial states will be stored
         
@@ -195,14 +208,14 @@ class Spatial(object):
      
     def __generate_traj(self):
         '''
-        Generate the Spatial Trajectories. Basically just calls '__propogate' for all times and parameters set up by
+        Generate the Spatial Trajectories. Basically just calls '__propagate' for all times and parameters set up by
         'process_config'
 
         Args:
             None
             
         Attributes Created:
-            spatial_states (list): spatial states stored after propogation at that time has occured
+            spatial_states (list): spatial states stored after propagation at that time has occured
             
         Returns:
             None        
@@ -211,36 +224,29 @@ class Spatial(object):
         assert(self.config_loaded)
         assert(self.config_processed)
         
-        for t in self.sample_times:
+        for time in self.sample_times:
             
-            # propogate spatial to time t
-            self.__propogate(t)
+            # propagate spatial to time t
+            self.__propagate(time)
             
             # append spatial state to list of states
-            e = self.state[0,0]
-            n = self.state[3,0]
-            u = self.state[6,0]
-            de = self.state[1,0]
-            dn = self.state[4,0]
-            du = self.state[7,0]
-            dde = self.state[2,0]
-            ddn = self.state[5,0]
-            ddu = self.state[8,0]
-            spatial_state = (self.time, e, n, u, de, dn, du, dde, ddn, ddu, self.speed, self.heading, self.pitch_angle,
-                            self.yaw_rate, self.pitch_rate)
-            self.spatial_states.append(spatial_state)
+            self.spatial_states.append(self.State)
+            
+        
+        # trim to only reported spatial_states
+        self.spatial_states = self.spatial_states[0::int(200*self.update_rate)]
         
         self.traj_generated = True
         
         
-    def __propogate(self, time):
+    def __propagate(self, time):
         '''
-        Propogate current spatial state to time 'time'. Right now, the maneuvers are treated separately than straight
-        propogation. By that I mean the maneuvers don't use a propogation matrix, which doesn't feel right for some
+        Propagate current spatial state to time 'time'. Right now, the maneuvers are treated separately than straight
+        propagation. By that I mean the maneuvers don't use a propagation matrix, which doesn't feel right for some
         reason, but it seems to work so I'm going to roll with it for now
         
         Args:
-            time (float): time to propogate current state to
+            time (float): time to propagate current state to
             
         Attributes Created:
             None, just updates a bunch
@@ -249,47 +255,45 @@ class Spatial(object):
             None 
         '''
         
-        dt = time - self.time
+        # make current state a deep copy of the previous state, otherwise we will modify the previously saved states
+        self.State = deepcopy(self.State)
         
-        # only propogate if the time given was later than current time
+        dt = time - self.State.time
+        
+        # only propagate if the time given was later than current time
         if dt > 0:
         
             man_performed = self.__perform_maneuvers(time)
             
-            # if a maneuver was performed, use the new velocity vector to calculate new acceleration and propogate pos.
-            # not sure if splitting up maneuver and straight propogation is the right way to do this...
+            # if a maneuver was performed, use the new velocity vector to calculate new acceleration and propagate pos.
+            # not sure if splitting up maneuver and straight propagation is the right way to do this...
             if man_performed:
                 
                 # speed, heading, and pitch angle are calculated according to maneuvers, convert them to an enu veloctiy
-                new_velocity_enu = xfrm.rbe_to_enu(np.array([[self.speed],
-                                                              [self.heading],
-                                                              [self.pitch_angle]]), col=True)
+                new_velocity_enu = xfrm.rbe_to_enu(np.array([[self.State.speed],
+                                                              [self.State.yaw],
+                                                              [self.State.pitch]]), col=True)
                 
                 # now use the new and old velocity to upate acceleration
-                old_velocity_enu = np.array([[self.state[1,0], self.state[4,0], self.state[7,0]]]).T
+                old_velocity_enu = self.State.get_velocity()
                 new_accel_enu = (new_velocity_enu - old_velocity_enu) / dt
                 
                 # now use new vel to porpogate old position enu
-                old_pos_enu = np.array([[self.state[0,0], self.state[3,0], self.state[6,0]]]).T
+                old_pos_enu = self.State.get_position()
                 new_pos_enu = old_pos_enu + (new_velocity_enu * dt)
                 
                 # update current state and speed
-                self.state = np.column_stack((new_pos_enu, new_velocity_enu, new_accel_enu)).reshape((9,1))
-                self.speed = Spatial.get_speed(self.state)
+                self.State.set_state(np.column_stack((new_pos_enu, new_velocity_enu, new_accel_enu)).reshape((9,1)))
             
-            # no maneuver was performed. straight propogation of current state
+            # no maneuver was performed. straight propagation of current state
             else:
-                self.yaw_rate = 0.0  # no maneuver, no yaw/pitch rate, accel
-                self.pitch_rate = 0.0
-                self.state[2,0] = 0.0
-                self.state[5,0] = 0.0
-                self.state[8,0] = 0.0
+                self.State.set_ang_vel(np.zeros((3,1)))
+                self.State.set_acceleration(np.zeros((3,1)))
                 prop_matrix = Spatial.make_prop_matrix(dt)  # prop matrix of order 3
             
-                self.state = np.matmul(prop_matrix, self.state)  # propogate state
-                self.speed = Spatial.get_speed(self.state)  # recalculate speed
+                self.State.set_state( np.matmul(prop_matrix, self.State.state) )
                 
-            self.time = time
+            self.State.time = time
     
     
     def __perform_maneuvers(self, time):
@@ -309,7 +313,7 @@ class Spatial(object):
             None
         
         Returns:
-            man_performed (bool): True if a maneuver was performed. Used to determine type of propogation to do.
+            man_performed (bool): True if a maneuver was performed. Used to determine type of propagation to do.
         '''
         
         man_performed = False
@@ -318,7 +322,8 @@ class Spatial(object):
             
             man_time = self.maneuvers[man_id]['time']
             man_finished = self.maneuvers[man_id]['finished']
-            if time <= man_time or man_finished:
+            finished_time = self.maneuvers[man_id]['finished_time']
+            if time <= man_time or man_finished or time >= finished_time:
                 continue
             
             man_performed = True  # past the conditions, so a maneuver is going to be performed
@@ -344,7 +349,7 @@ class Spatial(object):
             # if all parts are finished, the maneuver is finished
             if all(parts_finished):
                 self.maneuvers[man_id]['finished'] = True
-                self.maneuvers[man_id]['finished_time'] = time
+                self.maneuvers[man_id]['finished_time'] = time + 0.005
     
         return man_performed
     
@@ -363,37 +368,48 @@ class Spatial(object):
             maneuver_finished (bool): If we reached our final speed, mark as complete
         '''
         
-        dt = time - self.time
+        dt = time - self.State.time
         maneuver_finished = False
         
-        if self.speed == final_speed:
+        if self.State.speed == final_speed:
             maneuver_finished = True
-            return maneuver_finished
+            return 
+        
+        max_accel = self.max_gs * 9.81
+        
+        # this is technically only part of what I should do. I then need to propagate the state based on this...
+        # but the time interval is so short i can probably get away with it for my purposes, though it is not robust
+        # (applies to each maneuver)
+        self.State.axial_accel = max_accel + ( (self.State.axial_accel - max_accel) * (np.exp(-dt/self.accel_time_const)) )
+        if self.State.axial_accel > max_accel:
+            self.State.axial_accel = max_accel
         
         # going up or down?
-        speed_increase = True if final_speed > self.speed else False
+        speed_increase = True if final_speed > self.State.speed else False
         
         # going up
         if speed_increase:
-            speed = self.speed + (self.max_gs * 9.81 * dt)  # new speed (maybe)
+            speed = self.State.speed + (self.State.axial_accel * dt)  # new speed (maybe)
             
             # went up too much, we're at our threshold
             if speed > final_speed:
                 speed = final_speed
                 maneuver_finished = True
+                self.State.axial_accel = 0  # should probably change from this immediate decceleration to a time constant based one
             
-            self.speed = speed
+            self.State.speed = speed
         
         # going down
         else:
-            speed = self.speed - (self.max_gs * 9.81 * dt)  # new speed (maybe)
+            speed = self.State.speed - (self.State.axial_accel * dt)  # new speed (maybe)
             
             # went down too much, we're at our threshold
             if speed < final_speed:
                 speed = final_speed
                 maneuver_finished = True
+                self.State.axial_accel = 0
             
-            self.speed = speed
+            self.State.speed = speed
         
         return maneuver_finished
     
@@ -413,43 +429,51 @@ class Spatial(object):
             maneuver_finished (bool): If we reached our final heading, mark as complete
         '''
         
-        dt = time - self.time
+        dt = time - self.State.time
         maneuver_finished = False
         
-        if self.heading == final_heading:
-            self.yaw_rate = 0.0
+        max_lat_accel = self.max_lat_gs * 9.81
+        
+        if self.State.yaw == final_heading:
+            self.State.yaw_rate = 0.0
             maneuver_finished = True
             return maneuver_finished
         
+        self.State.lateral_accel = max_lat_accel + ( (self.State.lateral_accel - max_lat_accel) * (np.exp(-dt/self.accel_time_const)) )
+        if self.State.lateral_accel > max_lat_accel:
+            self.State.lateral_accel = max_lat_accel
+        
         # determine direction of turn
-        delta = map_pi_to_pi(self.heading - final_heading)
+        delta = map_pi_to_pi(self.State.yaw - final_heading)
         direction = 'right' if delta < 0 else 'left'
         
         if direction == 'right':
-            yaw_rate = self.max_lat_gs * 9.81 / self.speed
-            heading = self.heading + (yaw_rate * dt)
+            yaw_rate = self.State.lateral_accel / self.State.speed
+            heading = self.State.yaw + (yaw_rate * dt)
             
             # too far, set to final
             if heading > final_heading:
-                yaw_rate = (final_heading - self.heading) / dt
+                yaw_rate = (final_heading - self.State.yaw) / dt
                 heading = final_heading
                 maneuver_finished = True
+                self.State.lateral_accel = 0
             
-            self.yaw_rate = yaw_rate
-            self.heading = map_0_to_2pi(heading)
+            self.State.yaw_rate = yaw_rate
+            self.State.yaw = map_0_to_2pi(heading)
         
         else:
-            yaw_rate = -self.max_lat_gs * 9.81 / self.speed
-            heading = self.heading + (yaw_rate * dt)
+            yaw_rate = -self.State.lateral_accel / self.State.speed
+            heading = self.State.yaw + (yaw_rate * dt)
             
             # too far, set to final
             if heading < final_heading:
-                yaw_rate = (final_heading - self.heading) / dt
+                yaw_rate = (final_heading - self.State.yaw) / dt
                 heading = final_heading
                 maneuver_finished = True
+                self.State.lateral_accel = 0
             
-            self.yaw_rate = yaw_rate
-            self.heading = map_0_to_2pi(heading)
+            self.State.yaw_rate = yaw_rate
+            self.State.yaw = map_0_to_2pi(heading)
         
         return maneuver_finished
     
@@ -469,43 +493,51 @@ class Spatial(object):
             maneuver_finished (bool): If we reached our final pitch angle, mark as complete
         '''
         
-        dt = time - self.time
+        dt = time - self.State.time
         maneuver_finished = False
         
-        if self.pitch_angle == final_pitch_angle:
-            self.pitch_rate = 0.0
+        if self.State.pitch == final_pitch_angle:
+            self.State.pitch_rate = 0.0
             maneuver_finished = True
             return maneuver_finished
         
+        max_vert_accel = self.max_vert_gs * 9.81
+        
+        self.State.vertical_accel = max_vert_accel + ( (self.State.vertical_accel - max_vert_accel) * (np.exp(-dt/self.accel_time_const)) )
+        if self.State.vertical_accel > max_vert_accel:
+            self.State.vertical_accel = max_vert_accel
+        
         # determine direction of turn
-        delta = map_pi_to_pi(self.pitch_angle - final_pitch_angle)
+        delta = map_pi_to_pi(self.State.pitch - final_pitch_angle)
         direction = 'down' if delta > 0 else 'up'
         
         if direction == 'up':
-            pitch_rate = self.max_vert_gs * 9.81 / self.speed
-            pitch_angle = self.pitch_angle + (pitch_rate * dt)
+            pitch_rate = self.State.vertical_accel / self.State.speed
+            pitch_angle = self.State.pitch + (pitch_rate * dt)
             
             # too far, set to final
             if pitch_angle > final_pitch_angle:
-                pitch_rate = (final_pitch_angle - self.pitch_angle) / dt
+                pitch_rate = (final_pitch_angle - self.State.pitch) / dt
                 pitch_angle = final_pitch_angle
                 maneuver_finished = True
+                self.State.vertical_accel = 0
             
-            self.pitch_rate = pitch_rate
-            self.pitch_angle = map_pi_to_pi(pitch_angle)
+            self.State.pitch_rate = pitch_rate
+            self.State.pitch = map_pi_to_pi(pitch_angle)
         
         else:
-            pitch_rate = -self.max_vert_gs * 9.81 / self.speed
-            pitch_angle = self.pitch_angle + (pitch_rate * dt)
+            pitch_rate = -self.State.vertical_accel / self.State.speed
+            pitch_angle = self.State.pitch + (pitch_rate * dt)
             
             # too far, set to final
             if pitch_angle < final_pitch_angle:
-                pitch_rate = (final_pitch_angle - self.pitch_angle) / dt
+                pitch_rate = (final_pitch_angle - self.State.pitch) / dt
                 pitch_angle = final_pitch_angle
                 maneuver_finished = True
+                self.State.vertical_accel = 0
             
-            self.pitch_rate = pitch_rate
-            self.pitch_angle = map_pi_to_pi(pitch_angle)
+            self.State.pitch_rate = pitch_rate
+            self.State.pitch = map_pi_to_pi(pitch_angle)
         
         return maneuver_finished
     
@@ -524,17 +556,10 @@ class Spatial(object):
             None
         '''
         
-        if not numeric:
-            cols = ['time', 'east', 'north', 'up', 'east_vel', 'north_vel', 'up_vel', 'east_accel', 'north_accel',
-                    'up_accel', 'speed', 'heading', 'pitch_angle', 'yaw_rate', 'pitch_rate']
-            
-            states = DataFrame(self.spatial_states, columns=cols)
-            states.insert(0, 'name', self.spatial_name)
-            states.insert(0, 'id', self.spatial_num)
+        states = self.get_all_states(numeric)
+        if not numeric:          
             states.to_csv(fp)
         else:
-            states = DataFrame(self.spatial_states)
-            states.insert(0, 'temp', self.spatial_num)
             states.to_csv(fp, header=False, index=False)
     
     
@@ -550,53 +575,124 @@ class Spatial(object):
         Returns:
             all spatial states
         '''
+        
+        flattened_states = []
+        for State in self.spatial_states:
+            flattened_states.append(State.get_full_state_list())
+        
         if not numeric:
             cols = ['time', 'east', 'north', 'up', 'east_vel', 'north_vel', 'up_vel', 'east_accel', 'north_accel',
-                    'up_accel', 'speed', 'heading', 'pitch_angle', 'yaw_rate', 'pitch_rate']
+                    'up_accel', 'speed', 'yaw', 'pitch', 'roll', 'yaw_rate', 'pitch_rate', 'roll_rate', 'axial_accel',
+                    'lateral_accel', 'vertical_accel']
             
-            states = DataFrame(self.spatial_states, columns=cols)
+            states = DataFrame(flattened_states, columns=cols)
             states.insert(0, 'name', self.spatial_name)
             states.insert(0, 'id', self.spatial_num)
             return states
         else:
-            states = DataFrame(self.spatial_states)
+            states = DataFrame(flattened_states)
             states.insert(0, 'temp', self.spatial_num)
             states = states.values
             return states
         
     
-    def get_state(self, t):
-        ''' interpolate state to time t using existing states. this is not propogation. linear interpolation.
+    def get_state(self, prop_time, method='interp', prop_rate=0.001):
+        ''' For getting a state at the specified prop time.
         
         Args:
-            None
-        
-        Attribute Created:
-            None
-        
+            prop_time (float): time to get state at
+            method (str): 'interp' or 'propagate'. linearly interpolate between states or kinematic propagation
+            prop_rate (float): if 'propagate', integration interval to use. smaller is slower but more accurate.
+            
         Returns:
-            None
+            SpatialState object of the spatial spate of the trajectory at time prop_Time
         '''
         
-        states = np.array(self.spatial_states)
-        e = np.interp(t, states[:,0], states[:,1])
-        n = np.interp(t, states[:,0], states[:,2])
-        u = np.interp(t, states[:,0], states[:,3])
-        de = np.interp(t, states[:,0], states[:,4])
-        dn = np.interp(t, states[:,0], states[:,5])
-        du = np.interp(t, states[:,0], states[:,6])
-        dde = np.interp(t, states[:,0], states[:,7])
-        ddn = np.interp(t, states[:,0], states[:,8])
-        ddu = np.interp(t, states[:,0], states[:,9])
-        sp = np.interp(t, states[:,0], states[:,10])
-        hd = np.interp(t, states[:,0], states[:,11])
-        pt = np.interp(t, states[:,0], states[:,12])
-        yr = np.interp(t, states[:,0], states[:,13])
-        pr = np.interp(t, states[:,0], states[:,14])
+        # prop time requested must be a time when spatial existed
+        assert(prop_time >= self.spatial_states[0].time and prop_time <= self.spatial_states[-1].time)
         
-        return (t, e, n, u, de, dn, du, dde, ddn, ddu, sp, hd, pt, yr, pr)
+        # linearly interpolate between states at requested time
+        if method == 'interp':           
+            State = SpatialState()
+            states = self.get_all_states(numeric=True)
+            State.state[0,0] = np.interp(prop_time, states[:,1], states[:,2])
+            State.state[3,0] = np.interp(prop_time, states[:,1], states[:,3])
+            State.state[6,0] = np.interp(prop_time, states[:,1], states[:,4])
+            State.state[1,0] = np.interp(prop_time, states[:,1], states[:,5])
+            State.state[4,0] = np.interp(prop_time, states[:,1], states[:,6])
+            State.state[7,0] = np.interp(prop_time, states[:,1], states[:,7])
+            State.state[2,0] = np.interp(prop_time, states[:,1], states[:,8])
+            State.state[5,0] = np.interp(prop_time, states[:,1], states[:,9])
+            State.state[8,0] = np.interp(prop_time, states[:,1], states[:,10])
+            State.speed = np.interp(prop_time, states[:,1], states[:,11])
+            State.yaw = np.interp(prop_time, states[:,1], states[:,12])
+            State.pitch = np.interp(prop_time, states[:,1], states[:,13])
+            State.roll = np.interp(prop_time, states[:,1], states[:,14])
+            State.yaw_rate = np.interp(prop_time, states[:,1], states[:,15])
+            State.pitch_rate = np.interp(prop_time, states[:,1], states[:,16])
+            State.roll_rate = np.interp(prop_time, states[:,1], states[:,17])
+            State.axial_accel = np.interp(prop_time, states[:,1], states[:,18])
+            State.lateral_accel = np.interp(prop_time, states[:,1], states[:,19])
+            State.vertical_accel = np.interp(prop_time, states[:,1], states[:,20])
+            
+            return deepcopy(State)
+            
+        # ~more accurate propogation between states
+        elif method == 'propagate':
+            
+            # get most recent state before time t and set that state as current SpatialState
+            for i, State in enumerate(self.spatial_states):
+                # compare to state time
+                # implemented the isclose because I had issues with the propagated state not matching the interpolated
+                # equivalent at times that were like ~0.00000000001 seconds away from a reported state time.
+                if np.isclose(prop_time, State.time, atol=1e-07, rtol=0):
+                    return State
+                elif prop_time > State.time:  # not far enough, keep going
+                    continue  
+                else:  # went too far
+                    break
+            
+            NextState = deepcopy(State)
+            self.State = deepcopy(self.spatial_states[i-1])  # grabbing the one before we went too far
+            
+            # reset maneuvers to incomplete in case a time is called where they need to be run
+            for man_id in self.maneuvers:
+                self.maneuvers[man_id]['finished'] = False
+                
+            # 1000 Hz propogation to time t
+            for time in np.arange(self.State.time, prop_time+prop_rate, prop_rate):
+                if time > prop_time: break
+                self.__propagate(time)
+                final_time = time
+                
+            # just linearly interpolate the last bit
+            if final_time < prop_time:
+                self.State.time = prop_time
+                self.State.state[0,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[0,0], NextState.state[0,0]])
+                self.State.state[1,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[1,0], NextState.state[1,0]])
+                self.State.state[2,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[2,0], NextState.state[2,0]])
+                self.State.state[3,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[3,0], NextState.state[3,0]])
+                self.State.state[4,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[4,0], NextState.state[4,0]])
+                self.State.state[5,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[5,0], NextState.state[5,0]])
+                self.State.state[6,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[6,0], NextState.state[6,0]])
+                self.State.state[7,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[7,0], NextState.state[7,0]])
+                self.State.state[8,0] = np.interp(prop_time, [self.State.time, NextState.time], [self.State.state[8,0], NextState.state[8,0]])
+                self.State.speed = np.interp(prop_time, [self.State.time, NextState.time], [self.State.speed, NextState.speed])
+                self.State.yaw = np.interp(prop_time, [self.State.time, NextState.time], [self.State.yaw, NextState.yaw])
+                self.State.pitch = np.interp(prop_time, [self.State.time, NextState.time], [self.State.pitch, NextState.pitch])
+                self.State.roll = np.interp(prop_time, [self.State.time, NextState.time], [self.State.roll, NextState.roll])
+                self.State.yaw_rate = np.interp(prop_time, [self.State.time, NextState.time], [self.State.yaw_rate, NextState.yaw_rate])
+                self.State.pitch_rate = np.interp(prop_time, [self.State.time, NextState.time], [self.State.pitch_rate, NextState.pitch_rate])
+                self.State.roll_rate = np.interp(prop_time, [self.State.time, NextState.time], [self.State.roll_rate, NextState.roll_rate])
+                self.State.axial_accel = np.interp(prop_time, [self.State.time, NextState.time], [self.State.axial_accel, NextState.axial_accel])
+                self.State.lateral_accel = np.interp(prop_time, [self.State.time, NextState.time], [self.State.lateral_accel, NextState.lateral_accel])
+                self.State.vertical_accel = np.interp(prop_time, [self.State.time, NextState.time], [self.State.vertical_accel, NextState.vertical_accel])
+                      
+            return deepcopy(self.State)
         
-        
+        else:
+            raise("Method should be eithr 'propagate' or 'interp'")
+    
     def plot_states(self, directory=None):
         ''' generate some informative plots about our trajectory
         
@@ -656,8 +752,8 @@ class Spatial(object):
         ax2.set_xlabel('TIME')
         ax1.set_ylabel('HEADING')
         ax2.set_ylabel('PITCH ANGLE')
-        ax1.plot(states.time, np.rad2deg(states.heading))
-        ax2.plot(states.time, np.rad2deg(states.pitch_angle))
+        ax1.plot(states.time, np.rad2deg(states.yaw))
+        ax2.plot(states.time, np.rad2deg(states.pitch))
     
         if directory is not None:
             fig1.savefig(os.path.join(directory, '{}_east_north.csv'.format(self.spatial_name)))
@@ -688,23 +784,31 @@ class Spatial(object):
             stop = self.maneuvers[man_id]['finished_time']
             
             states = self.get_all_states()
-            states = states[(states.time >= start) & (states.time <= stop)]
+            
+            for t in states.time.tolist():
+                if t < stop:
+                    continue
+                else:
+                    nearest_reported_time = t
+                    break
+            
+            states = states[(states.time >= start) & (states.time <= nearest_reported_time)]
             total_gs = max((states.east_accel**2 + states.north_accel**2 + states.up_accel**2)**0.5) / 9.81
             
             start_state = self.get_state(start)
-            start_speed = start_state[10]
-            start_heading = r2d(start_state[11])
-            start_pitch = r2d(start_state[12])
-            stop_state = self.get_state(stop)
-            stop_speed = stop_state[10]
-            stop_heading = r2d(stop_state[11])
-            stop_pitch = r2d(stop_state[12])
+            start_speed = start_state.speed
+            start_heading = r2d(start_state.yaw)
+            start_pitch = r2d(start_state.pitch)
+            stop_state = self.get_state(nearest_reported_time)
+            stop_speed = stop_state.speed
+            stop_heading = r2d(stop_state.yaw)
+            stop_pitch = r2d(stop_state.pitch)
             
             
             s += '\n\nManeuver {}\n'.format(man_id)
             s += '\tStart Time: {:.2f}\n'.format(start)
-            s += '\tStop Time: {:.2f}\n'.format(stop)
-            s += '\tDuration: {:.2f}\n'.format(stop-start)
+            s += '\tStop Time: {:.2f}\n'.format(nearest_reported_time)
+            s += '\tDuration: {:.2f}\n'.format(nearest_reported_time-start)
             s += '\tPeak Total Gs: {:.2f}\n'.format(total_gs)
             s += '\tStart/Stop Speed: {:.2f}/{:.2f}\n'.format(start_speed, stop_speed)
             s += '\tStart/Stop Heading: {:.2f}/{:.2f}\n'.format(start_heading, stop_heading)
@@ -715,37 +819,37 @@ class Spatial(object):
     
     @staticmethod
     def make_prop_matrix(dt):
-        ''' propogation matrix'''
+        ''' propagation matrix'''
 
         phi = np.array([[1, dt, (dt**2)/2],
                         [0, 1, dt],
                         [0, 0, 1]])
         phi = np.kron(np.eye(3), phi)
         return phi
-    
-    @staticmethod
-    def get_speed(state):
-        
-        enu_vel = np.array([state[1,0], state[4,0], state[7,0]])
-        speed = np.linalg.norm(enu_vel)
-        
-        return speed
               
             
             
 if __name__ == '__main__':
     
-    spatial = Spatial('C:/Users/John/Documents/Python Scripts/radar/targets/target_lazy_turn.yaml', process=True)
+    players_path = os.path.realpath(__file__)
+    pydarsim_path = players_path[:players_path.rfind('\players')]
+    config_fp = os.path.join(pydarsim_path, 'test/test_spatials/target1.yaml')
+    csv_fp = os.path.join(pydarsim_path, 'test/test_spatials/target1_traj.yaml')
+    
+    spatial = Spatial(config_fp, process=True)
     states = spatial.get_all_states()
-    spatial.write_traj('C:/Users/John/Documents/Python Scripts/radar/targets/target_lazy_turn.csv')
+    spatial.write_traj(csv_fp)
     spatial.plot_states()
     print(spatial)
     print(spatial.maneuver_info())
     
-    # spatial2 = Spatial('C:/Users/John/Documents/Python Scripts/radar/targets/target2.yaml', process=True)
-    # states2 = spatial2.get_all_states()
-    # spatial2.write_traj('C:/Users/John/Documents/Python Scripts/radar/targets/target2.csv')
-    # spatial2.plot_states()
-    # print(spatial2)
-    # print(spatial2.maneuver_info())
+    config_fp2 = os.path.join(pydarsim_path, 'test/test_spatials/target1_10Hz.yaml')
+    csv_fp2 = os.path.join(pydarsim_path, 'test/test_spatials/target1_10Hz_traj.yaml')
+    
+    spatial2 = Spatial(config_fp2, process=True)
+    states2 = spatial2.get_all_states()
+    spatial2.write_traj(csv_fp2)
+    spatial2.plot_states()
+    print(spatial2)
+    print(spatial2.maneuver_info())
     
