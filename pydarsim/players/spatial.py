@@ -15,8 +15,10 @@ from copy import deepcopy
 from pydarsim.support.tools import load_yaml, map_pi_to_pi, map_0_to_2pi, makedir
 from pydarsim.support import xfrm
 from pydarsim.support.spatial_state import SpatialState
+from pydarsim.support.PID import PID
 
 from pdb import set_trace
+
 
 class Spatial(object):
     '''
@@ -40,24 +42,29 @@ class Spatial(object):
         self.config_processed = False
         self.traj_generated = False
         
+        self.integration_step = 0.005
+        
         if config_fp is not None:
             self.load_config(config_fp, process=process)
     
     
     def __str__(self):
         
-        states = self.get_all_states()
+        states = self.get_all_states(add_lla=True)
         start_time = states.time.min()
         stop_time = states.time.max()
         duration = stop_time - start_time
         max_speed = states.speed.max()
         min_speed = states.speed.min()
-        max_gs = max((states.east_accel**2 + states.north_accel**2 + states.up_accel**2)**0.5) / 9.81
+        max_gs = max((states.ddx**2 + states.ddy**2 + states.ddz**2)**0.5) / 9.81
         min_heading, max_heading = r2d(states.yaw.min()), r2d(states.yaw.max())
         min_pitch, max_pitch = r2d(states.pitch.min()), r2d(states.pitch.max())
-        min_east, max_east = states.east.min(), states.east.max()
-        min_north, max_north = states.north.min(), states.north.max()
-        min_up, max_up = states.up.min(), states.up.max()
+        min_x, max_x = states.x.min(), states.x.max()
+        min_y, max_y = states.y.min(), states.y.max()
+        min_z, max_z = states.z.min(), states.z.max()
+        min_lat, max_lat = r2d(states.LAT.min()), r2d(states.LAT.max())
+        min_lon, max_lon = r2d(states.LON.min()), r2d(states.LON.max())
+        min_alt, max_alt = states.ALT.min(), states.ALT.max()
         
         s = ''
         s += "Spatial Name: {}\n".format(self.spatial_name)
@@ -71,9 +78,12 @@ class Spatial(object):
             s += 'Max Total Gs: {:.2f}\n'.format(max_gs)
             s += 'Min/Max Heading: ({:.2f}, {:.2f})\n'.format(min_heading, max_heading)
             s += 'Min/Max Pitch: ({:.2f}, {:.2f})\n'.format(min_pitch, max_pitch)
-            s += 'Min/Max East: ({:.2f}, {:.2f})\n'.format(min_east, max_east)
-            s += 'Min/Max North: ({:.2f}, {:.2f})\n'.format(min_north, max_north)
-            s += 'Min/Max Up: ({:.2f}, {:.2f})\n'.format(min_up, max_up)
+            s += 'Min/Max X: ({:.2f}, {:.2f})\n'.format(min_x, max_x)
+            s += 'Min/Max Y: ({:.2f}, {:.2f})\n'.format(min_y, max_y)
+            s += 'Min/Max Z: ({:.2f}, {:.2f})\n'.format(min_z, max_z)
+            s += 'Min/Max Latitude: ({:.4f}, {:.4f})\n'.format(min_lat, max_lat)
+            s += 'Min/Max Longitude: ({:.4f}, {:.4f})\n'.format(min_lon, max_lon)
+            s += 'Min/Max Altitude: ({:.2f}, {:.2f})\n'.format(min_alt, max_alt)
         
         return s
             
@@ -146,7 +156,7 @@ class Spatial(object):
         self.start_time = self.init_params['start_time']
         self.stop_time = self.init_params['stop_time']
         self.update_rate = self.kinematic_params['update_rate']  # update period in seconds
-        self.sample_times = np.arange(self.start_time, self.stop_time+self.update_rate, 0.005)
+        self.sample_times = np.arange(self.start_time, self.stop_time+self.update_rate, self.integration_step)
         self.report_times = np.arange(self.start_time, self.stop_time+self.update_rate, self.update_rate)
         
         # unpack max gs info
@@ -156,41 +166,51 @@ class Spatial(object):
         self.accel_time_const = self.kinematic_params['accel_time_const'] 
         
         # get initial position
-        east = self.init_params['east']
-        north = self.init_params['north']
-        up = self.init_params['up']
-        self.initial_position = np.array([[east],
-                                          [north],
-                                          [up]])
+        latitude = d2r(self.init_params['latitude'])
+        longitude = d2r(self.init_params['longitude'])
+        altitude = self.init_params['altitude']
+        lla = np.array([[latitude, longitude, altitude]]).T
+        ecef_pos = xfrm.lla_to_ecef(lla)
+        enu_pos = xfrm.ecef_to_enu(ecef_pos, lla)
         
         # get initial velocity
         self.initial_speed = self.init_params['speed']
         self.initial_heading = map_0_to_2pi(d2r(self.init_params['heading']))
         self.initial_pitch_angle = map_pi_to_pi(d2r(self.init_params['pitch_angle']))
-        self.initial_velocity = xfrm.rbe_to_enu(np.array([[self.initial_speed],
-                                                          [self.initial_heading],
-                                                          [self.initial_pitch_angle]]), col=True)
+        enu_vel = xfrm.rbe_to_enu(np.array([[self.initial_speed],
+                                            [self.initial_heading],
+                                            [self.initial_pitch_angle]]))
+        
+        self.initial_acceleration = np.zeros((3,1))
+        
+        enu_state = np.column_stack((enu_pos, enu_vel, self.initial_acceleration)).reshape((9,1))
+        ecef_state = xfrm.enu_to_ecef(enu_state, lla)
         
         # form initial state
-        self.initial_acceleration = np.zeros((3,1))
-        self.initial_state = np.column_stack((self.initial_position, self.initial_velocity, self.initial_acceleration)).reshape((9,1))
-    
-    
-        # maneuver parameters
-        self.initial_yaw_rate = 0.0
-        self.initial_pitch_rate = 0.0
+        self.initial_state = ecef_state
         
         # mark maneuvers an incomplete
         for man_id in self.maneuvers:
             self.maneuvers[man_id]['finished'] = False
             self.maneuvers[man_id]['finished_time'] = np.inf
+            
+        self.heading_maneuver_in_progress = False
+        self.speed_maneuver_in_progress = False
+        self.altitude_maneuver_in_progress = False
+        
+        # initialize PIDs if using autopilot (don't like this being here but don't feel like rewriting this whole thing)
+        if self.kinematic_params['autopilot']:
+            self.speed_PID = PID(kp=0.8, ki=0.0, kd=0.2)
+            self.climb_PID = PID(kp=0.8, ki=0.0, kd=0.2)
+            self.vert_accel_PID = PID(kp=0.8, ki=0.0, kd=0.2)
+            self.yaw_rate_PID = PID(kp=0.8, ki=0.0, kd=0.2)
         
         # fill in current-state variables
         self.State = SpatialState()
         self.State.time = self.start_time
         self.State.state = self.initial_state
-        self.State.yaw_rate = self.initial_yaw_rate
-        self.State.pitch_rate = self.initial_pitch_rate
+        self.State.yaw_rate = 0.0
+        self.State.pitch_rate = 0.0
         self.State.speed = self.initial_speed
         self.State.yaw = self.initial_heading
         self.State.pitch = self.initial_pitch_angle
@@ -234,7 +254,7 @@ class Spatial(object):
             
         
         # trim to only reported spatial_states
-        self.spatial_states = self.spatial_states[0::int(200*self.update_rate)]
+        self.spatial_states = self.spatial_states[0::int(self.update_rate/self.integration_step)]
         
         self.traj_generated = True
         
@@ -269,29 +289,47 @@ class Spatial(object):
             # not sure if splitting up maneuver and straight propagation is the right way to do this...
             if man_performed:
                 
+                old_spatial_lla = xfrm.ecef_to_lla(self.State.get_position())
+                
                 # speed, heading, and pitch angle are calculated according to maneuvers, convert them to an enu veloctiy
-                new_velocity_enu = xfrm.rbe_to_enu(np.array([[self.State.speed],
-                                                              [self.State.yaw],
-                                                              [self.State.pitch]]), col=True)
+                course = self.State.get_course()
+                new_velocity_enu = xfrm.rbe_to_enu(course)
+                
+                old_enu_state = xfrm.ecef_to_enu(self.State.state, old_spatial_lla)
+                old_velocity_enu = np.array([[old_enu_state[1,0]],
+                                             [old_enu_state[4,0]],
+                                             [old_enu_state[7,0]]])
                 
                 # now use the new and old velocity to upate acceleration
-                old_velocity_enu = self.State.get_velocity()
                 new_accel_enu = (new_velocity_enu - old_velocity_enu) / dt
                 
                 # now use new vel to porpogate old position enu
-                old_pos_enu = self.State.get_position()
+                old_pos_enu = np.array([[old_enu_state[0,0]],
+                                        [old_enu_state[3,0]],
+                                        [old_enu_state[6,0]]])
                 new_pos_enu = old_pos_enu + (new_velocity_enu * dt)
+                new_state_enu = np.column_stack((new_pos_enu, new_velocity_enu, new_accel_enu)).reshape((9,1))
+                new_state_ecef = xfrm.enu_to_ecef(new_state_enu, old_spatial_lla)
                 
                 # update current state and speed
-                self.State.set_state(np.column_stack((new_pos_enu, new_velocity_enu, new_accel_enu)).reshape((9,1)))
+                self.State.set_state(new_state_ecef)
             
             # no maneuver was performed. straight propagation of current state
             else:
                 self.State.set_ang_vel(np.zeros((3,1)))
                 self.State.set_acceleration(np.zeros((3,1)))
-                prop_matrix = Spatial.make_prop_matrix(dt)  # prop matrix of order 3
             
-                self.State.set_state( np.matmul(prop_matrix, self.State.state) )
+                old_spatial_lla = xfrm.ecef_to_lla(self.State.get_position())
+                course = self.State.get_course()
+                enu_vel = xfrm.rbe_to_enu(course)
+                enu_vel[2,0] = 0.0
+                new_enu_pos_relative_to_body = enu_vel * dt
+                new_enu_state = np.column_stack((new_enu_pos_relative_to_body, enu_vel, np.zeros((3,1)))).reshape((9,1))
+                new_ecef_state = xfrm.enu_to_ecef(new_enu_state, old_spatial_lla)
+                
+                self.State.set_state(new_ecef_state)
+                #self.State.speed = course[0,0]
+                
                 
             self.State.time = time
     
@@ -330,26 +368,42 @@ class Spatial(object):
             
             # maneuvers can have speed, heading, and pitch componenets. Right now they are treated individually
             # so the total gs can exceed each individual g component. Don't really like this...
+            #!!! Maybe the speed should be updated last? !!!
             parts_finished = []  # keep track of if each part of maneuver is finished
             if 'final_speed' in self.maneuvers[man_id]:
                 final_speed = self.maneuvers[man_id]['final_speed']
-                speed_man_finished = self.__speed_maneuver(time, final_speed)
+                if self.kinematic_params['autopilot']:
+                    speed_man_finished = self.__speed_autopilot(time, final_speed)
+                else:
+                    speed_man_finished = self.__speed_maneuver(time, final_speed)
                 parts_finished.append(speed_man_finished)
                 
             if 'final_heading' in self.maneuvers[man_id]:
                 final_heading = map_0_to_2pi(d2r(self.maneuvers[man_id]['final_heading']))
-                heading_man_finished = self.__heading_change_maneuver(time, final_heading)
+                if self.kinematic_params['autopilot']:
+                    heading_man_finished = self.__heading_change_autopilot(time, final_heading)
+                else:
+                    heading_man_finished = self.__heading_change_maneuver(time, final_heading)
                 parts_finished.append(heading_man_finished)
                 
-            if 'final_pitch_angle' in self.maneuvers[man_id]:
-                final_pitch_angle = map_pi_to_pi(d2r(self.maneuvers[man_id]['final_pitch_angle']))
-                pitch_finished = self.__pitch_maneuver(time, final_pitch_angle)
-                parts_finished.append(pitch_finished)
+            # if 'final_pitch_angle' in self.maneuvers[man_id]:
+            #     final_pitch_angle = map_pi_to_pi(d2r(self.maneuvers[man_id]['final_pitch_angle']))
+            #     pitch_finished = self.__pitch_maneuver(time, final_pitch_angle)
+            #     parts_finished.append(pitch_finished)
+            
+            if 'final_altitude' in self.maneuvers[man_id]:
+                final_altitude = self.maneuvers[man_id]['final_altitude']
+                climb_rate = self.maneuvers[man_id]['climb_rate']
+                if self.kinematic_params['autopilot']:
+                    altitude_finished = self.__altitude_autopilot(time, final_altitude, climb_rate)
+                else:
+                    altitude_finished = self.__altitude_maneuver(time, final_altitude, climb_rate)
+                parts_finished.append(altitude_finished)
             
             # if all parts are finished, the maneuver is finished
             if all(parts_finished):
                 self.maneuvers[man_id]['finished'] = True
-                self.maneuvers[man_id]['finished_time'] = time + 0.005
+                self.maneuvers[man_id]['finished_time'] = time + self.integration_step
     
         return man_performed
     
@@ -376,14 +430,8 @@ class Spatial(object):
             return 
         
         max_accel = self.max_gs * 9.81
-        
-        # this is technically only part of what I should do. I then need to propagate the state based on this...
-        # but the time interval is so short i can probably get away with it for my purposes, though it is not robust
-        # (applies to each maneuver)
-        self.State.axial_accel = max_accel + ( (self.State.axial_accel - max_accel) * (np.exp(-dt/self.accel_time_const)) )
-        if self.State.axial_accel > max_accel:
-            self.State.axial_accel = max_accel
-        
+        self.State.axial_accel = max_accel
+         
         # going up or down?
         speed_increase = True if final_speed > self.State.speed else False
         
@@ -395,7 +443,7 @@ class Spatial(object):
             if speed > final_speed:
                 speed = final_speed
                 maneuver_finished = True
-                self.State.axial_accel = 0  # should probably change from this immediate decceleration to a time constant based one
+                self.State.axial_accel = 0  
             
             self.State.speed = speed
         
@@ -410,6 +458,69 @@ class Spatial(object):
                 self.State.axial_accel = 0
             
             self.State.speed = speed
+        
+        return maneuver_finished
+    
+    
+    def __speed_autopilot(self, time, final_speed):
+        ''' Based on the current state, max gs set, and our final_speed goal, calculate what our speed will be at 'time'.
+        Uses a PID (really PD) loop and lag filter on axial acceleration to approach desired speed.
+        
+        Args:
+            time (float): time to perform the maneuver through
+            final_speed (float): our speed we desire to reach (how close we get this iteration depends on max gs)
+        
+        Attribute Created:
+            None
+        
+        Returns:
+            maneuver_finished (bool): If we reached our final speed, mark as complete
+        '''
+        
+        # if first step in maneuver, mark as in progress and initialize counter/timer to 0 that tracks if the maneuver is complete
+        if self.speed_maneuver_in_progress == False:
+            self.speed_maneuver_in_progress = True
+            self.speed_within_error_tolerance_duration = 0
+        
+        # get time difference since last update and set return flag to default False
+        dt = time - self.State.time
+        maneuver_finished = False
+        
+        # get error between current speed and final speed goal
+        current_speed = self.State.speed
+        error = final_speed - current_speed
+        
+        # if we're within a small fraction of our desired speed, increment the timer that keeps track of how long we've been within the bounds
+        if abs(error) < 0.00001 * final_speed:
+            self.speed_within_error_tolerance_duration += dt
+        
+        # get commanded acceleration from PID loop
+        cmd_acc = self.speed_PID.update(dt, error)
+        
+        # apply limits to acceleration
+        if cmd_acc >= 0:
+            cmd_acc = min(self.max_gs*9.81, cmd_acc)
+        else:
+            cmd_acc = max(-self.max_gs*9.81, cmd_acc)
+        
+        # apply time first order filter lag filter
+        prev_acc = self.State.axial_accel
+        cmd_acc = prev_acc + ( (cmd_acc - prev_acc) * (1-np.exp(-dt/self.accel_time_const)) )
+        
+        # propogate speed based on computed acceleration
+        new_speed = current_speed + (cmd_acc * dt)
+        
+        self.State.speed = new_speed
+        self.State.axial_accel = cmd_acc
+        
+        # if we've been within our bounds for at least 1 second, we're done. reset everything.
+        if self.speed_within_error_tolerance_duration >= 1:
+            maneuver_finished = True
+            self.speed_maneuver_in_progress = False
+            self.speed_within_error_tolerance_duration = 0
+            self.speed_PID.reset()
+            self.State.speed = final_speed
+            self.State.axial_accel = 0.0
         
         return maneuver_finished
     
@@ -433,16 +544,13 @@ class Spatial(object):
         maneuver_finished = False
         
         max_lat_accel = self.max_lat_gs * 9.81
+        self.State.lateral_accel = max_lat_accel
         
         if self.State.yaw == final_heading:
             self.State.yaw_rate = 0.0
             maneuver_finished = True
             return maneuver_finished
-        
-        self.State.lateral_accel = max_lat_accel + ( (self.State.lateral_accel - max_lat_accel) * (np.exp(-dt/self.accel_time_const)) )
-        if self.State.lateral_accel > max_lat_accel:
-            self.State.lateral_accel = max_lat_accel
-        
+
         # determine direction of turn
         delta = map_pi_to_pi(self.State.yaw - final_heading)
         direction = 'right' if delta < 0 else 'left'
@@ -478,70 +586,289 @@ class Spatial(object):
         return maneuver_finished
     
     
-    def __pitch_maneuver(self, time, final_pitch_angle):
-        ''' Based on the current state, max gs set, and our final_pitch_angle goal, calculate what our angle will
-        be at 'time'
+    def __heading_change_autopilot(self, time, final_heading):
+        ''' Based on the current state, max gs set, and our final_heading goal, calculate what our heading will
+        be at 'time'. Uses a PID (really PD) loop and lag filter of lateral acceleration to approach desired heading.
         
         Args:
-            time (float): time to perform maneuver through
-            final_pitch_angle (float): the pitch_angle we're aiming for
+            time (float): time to perform the maneuver through
+            final_heading (float): heading we desire to reach (how close we get this iteration depends on max gs)
         
         Attribute Created:
             None
         
         Returns:
-            maneuver_finished (bool): If we reached our final pitch angle, mark as complete
+            maneuver_finished (bool): If we reached our final heading, mark as complete
         '''
         
+        # if first step in maneuver, mark as in progress and initialize counter/timer to 0 that tracks if the maneuver is complete
+        if self.heading_maneuver_in_progress == False:
+            self.heading_maneuver_in_progress = True
+            self.heading_within_error_tolerance_duration = 0
+        
+        # time diff and default maneuver not finished
         dt = time - self.State.time
         maneuver_finished = False
         
-        if self.State.pitch == final_pitch_angle:
-            self.State.pitch_rate = 0.0
-            maneuver_finished = True
-            return maneuver_finished
+        # how far off are we from our desired heading?
+        current_heading = self.State.yaw
+        error = map_pi_to_pi(final_heading - current_heading)
         
-        max_vert_accel = self.max_vert_gs * 9.81
-        
-        self.State.vertical_accel = max_vert_accel + ( (self.State.vertical_accel - max_vert_accel) * (np.exp(-dt/self.accel_time_const)) )
-        if self.State.vertical_accel > max_vert_accel:
-            self.State.vertical_accel = max_vert_accel
-        
-        # determine direction of turn
-        delta = map_pi_to_pi(self.State.pitch - final_pitch_angle)
-        direction = 'down' if delta > 0 else 'up'
-        
-        if direction == 'up':
-            pitch_rate = self.State.vertical_accel / self.State.speed
-            pitch_angle = self.State.pitch + (pitch_rate * dt)
-            
-            # too far, set to final
-            if pitch_angle > final_pitch_angle:
-                pitch_rate = (final_pitch_angle - self.State.pitch) / dt
-                pitch_angle = final_pitch_angle
-                maneuver_finished = True
-                self.State.vertical_accel = 0
-            
-            self.State.pitch_rate = pitch_rate
-            self.State.pitch = map_pi_to_pi(pitch_angle)
-        
+        # if we're within a small fraction of our desired heading, increment the timer that keeps track of how long we've been within the bounds
+        if abs(error) < 0.00001 * final_heading:
+            self.heading_within_error_tolerance_duration += dt
         else:
-            pitch_rate = -self.State.vertical_accel / self.State.speed
-            pitch_angle = self.State.pitch + (pitch_rate * dt)
+            self.heading_within_error_tolerance_duration = 0  # else, reset it
+        
+        # update PID to get commanded yaw rate. use it and speed to compute lateral acceleration
+        cmd_yaw_rate = self.yaw_rate_PID.update(dt, error)
+        speed = self.State.speed
+        cmd_lat_acc = cmd_yaw_rate * speed
+        
+        # limit our commanded acceleration based on user defined limits
+        max_lat_accel = self.max_lat_gs * 9.81
+        if cmd_lat_acc > 0:
+            cmd_lat_acc = min(cmd_lat_acc, max_lat_accel)
+        else:
+            cmd_lat_acc = max(cmd_lat_acc, -max_lat_accel)
             
-            # too far, set to final
-            if pitch_angle < final_pitch_angle:
-                pitch_rate = (final_pitch_angle - self.State.pitch) / dt
-                pitch_angle = final_pitch_angle
-                maneuver_finished = True
-                self.State.vertical_accel = 0
+        # apply time first order filter lag filter to acceleration
+        prev_lat_acc = self.State.lateral_accel
+        cmd_lat_acc = prev_lat_acc + ( (cmd_lat_acc - prev_lat_acc) * (1-np.exp(-dt/self.accel_time_const)) )
+        
+        # update yaw rate and heading
+        yaw_rate = cmd_lat_acc / speed
+        heading = current_heading + (yaw_rate * dt)
+        
+        # save to State
+        self.State.yaw_rate = yaw_rate
+        self.State.yaw = map_0_to_2pi(heading)
+        self.State.lateral_accel = cmd_lat_acc
+        
+        # if we've been within our bounds for at least 1 second, we're done. reset everything.
+        if self.heading_within_error_tolerance_duration >= 1:
+            maneuver_finished = True
+            self.heading_maneuver_in_progress = False
+            self.heading_within_error_tolerance_duration = 0
+            self.yaw_rate_PID.reset()
+            self.State.yaw = map_0_to_2pi(final_heading)
+            self.State.yaw_rate = 0.0
+        
+        return maneuver_finished
+        
+      
+    # def __pitch_maneuver(self, time, final_pitch_angle):
+    #     ''' Based on the current state, max gs set, and our final_pitch_angle goal, calculate what our angle will
+    #     be at 'time'
+        
+    #     Args:
+    #         time (float): time to perform maneuver through
+    #         final_pitch_angle (float): the pitch_angle we're aiming for
+        
+    #     Attribute Created:
+    #         None
+        
+    #     Returns:
+    #         maneuver_finished (bool): If we reached our final pitch angle, mark as complete
+    #     '''
+        
+    #     dt = time - self.State.time
+    #     maneuver_finished = False
+        
+    #     if self.State.pitch == final_pitch_angle:
+    #         self.State.pitch_rate = 0.0
+    #         maneuver_finished = True
+    #         return maneuver_finished
+        
+    #     max_vert_accel = self.max_vert_gs * 9.81
+        
+    #     self.State.vertical_accel = max_vert_accel + ( (self.State.vertical_accel - max_vert_accel) * (np.exp(-dt/self.accel_time_const)) )
+    #     if self.State.vertical_accel > max_vert_accel:
+    #         self.State.vertical_accel = max_vert_accel
+        
+    #     # determine direction of turn
+    #     delta = map_pi_to_pi(self.State.pitch - final_pitch_angle)
+    #     direction = 'down' if delta > 0 else 'up'
+        
+    #     if direction == 'up':
+    #         pitch_rate = self.State.vertical_accel / self.State.speed
+    #         pitch_angle = self.State.pitch + (pitch_rate * dt)
             
-            self.State.pitch_rate = pitch_rate
-            self.State.pitch = map_pi_to_pi(pitch_angle)
+    #         # too far, set to final
+    #         if pitch_angle > final_pitch_angle:
+    #             pitch_rate = (final_pitch_angle - self.State.pitch) / dt
+    #             pitch_angle = final_pitch_angle
+    #             maneuver_finished = True
+    #             self.State.vertical_accel = 0
+            
+    #         self.State.pitch_rate = pitch_rate
+    #         self.State.pitch = map_pi_to_pi(pitch_angle)
+        
+    #     else:
+    #         pitch_rate = -self.State.vertical_accel / self.State.speed
+    #         pitch_angle = self.State.pitch + (pitch_rate * dt)
+            
+    #         # too far, set to final
+    #         if pitch_angle < final_pitch_angle:
+    #             pitch_rate = (final_pitch_angle - self.State.pitch) / dt
+    #             pitch_angle = final_pitch_angle
+    #             maneuver_finished = True
+    #             self.State.vertical_accel = 0
+            
+    #         self.State.pitch_rate = pitch_rate
+    #         self.State.pitch = map_pi_to_pi(pitch_angle)
+        
+    #     return maneuver_finished
+    
+    
+    def __altitude_maneuver(self, time, final_altitude, climb_rate):
+        ''' Perform a change of altitude maneuver, limited by climb_rate.
+        
+        Args:
+            time (float): time to perform the maneuver through
+            final_altitude (float): altitude at end of maneuver (m)
+            climb_rate (float): limit maximum climb (or decent) rate
+        
+        Attribute Created:
+            None
+        
+        Returns:
+            maneuver_finished (bool): If we reached our final altitude, mark as complete
+        '''
+        dt = time - self.State.time
+        maneuver_finished = False
+        
+        if self.altitude_maneuver_in_progress == False:
+            self.altitude_maneuver_in_progress = True
+            self.altitude_within_error_tolerance_duration = 0
+        
+        # get current altitude of state
+        current_altitude = xfrm.ecef_to_lla(self.State.get_position())[2,0]
+        
+        
+        max_vert_accel = self.max_vert_gs * 9.81   
+        self.State.vertical_accel = max_vert_accel
+        
+        alt_error = final_altitude - current_altitude
+        
+        if abs(alt_error) < 0.001:
+            self.altitude_within_error_tolerance_duration += dt
+        else:
+            self.altitude_within_error_tolerance_duration = 0
+        
+        cvv = alt_error / 1
+        
+        vvmax = climb_rate
+        
+        if abs(cvv) > vvmax:
+            cvv = -vvmax if cvv < 0 else vvmax
+        
+        cpitch = np.arcsin(cvv/self.State.speed)
+        
+        perror = cpitch - self.State.pitch
+        
+        pitch_rate = perror / dt
+        
+        #pitchRateLimit = self.max_vert_gs*9.81/self.State.speed
+        pitchRateLimit = self.State.vertical_accel/self.State.speed
+        if abs(pitch_rate) > pitchRateLimit:
+            pitch_rate = pitchRateLimit if pitch_rate > 0 else -pitchRateLimit
+        
+        self.State.pitch_rate = pitch_rate
+        self.State.pitch = self.State.pitch + (pitch_rate * dt)
+        
+        if self.altitude_within_error_tolerance_duration >= 1:
+            maneuver_finished = True
+            self.altitude_maneuver_in_progress = False
+            self.altitude_within_error_tolerance_duration = 0
+            self.State.pitch = 0.0
+            self.State.pitch_rate = 0.0
         
         return maneuver_finished
     
     
+    def __altitude_autopilot(self, time, final_altitude, climb_rate):
+        ''' Perform a change of altitude maneuver, limited by climb_rate.
+        This is the preferred method of doing altitude maneuvers.
+        
+        Args:
+            time (float): time to perform the maneuver through
+            final_altitude (float): altitude at end of maneuver (m)
+            climb_rate (float): limit maximum climb (or decent) rate
+        
+        Attribute Created:
+            None
+        
+        Returns:
+            maneuver_finished (bool): If we reached our final altitude, mark as complete
+        '''
+        
+        # get dt since that update and default maneuver to not finished
+        dt = time - self.State.time
+        maneuver_finished = False
+        
+        # some current attributes we need
+        current_pitch = self.State.pitch
+        current_altitude = xfrm.ecef_to_lla(self.State.get_position())[2,0]
+        max_vert_accel = self.max_vert_gs * 9.81
+        speed = self.State.speed
+        current_alt_rate = speed * np.sin(current_pitch)
+        
+        # if this is the first step in the maneuver, mark as in progress and get "timer" going
+        if self.altitude_maneuver_in_progress == False:
+            self.altitude_maneuver_in_progress = True
+            self.altitude_within_error_tolerance_duration = 0  # consecutive time counter that maneuver is within desired bounds
+                 
+        alt_error = final_altitude - current_altitude
+        
+        # if the altitude error is within 1mm, increment timer, else reset it to 0
+        if abs(alt_error) <= 0.001:
+            self.altitude_within_error_tolerance_duration += dt
+        else:
+            self.altitude_within_error_tolerance_duration = 0
+        
+        # update climb rate PID to get commanded climb rate
+        cmd_alt_rate = self.climb_PID.update(dt, alt_error)
+        
+        # apply limits based on user specified climb rate
+        if cmd_alt_rate >= 0:
+            cmd_alt_rate = min(climb_rate, cmd_alt_rate)
+        else:
+            cmd_alt_rate = max(-climb_rate, cmd_alt_rate)
+        
+        # how far out are we of the desired climb rate?
+        alt_rate_error = cmd_alt_rate - current_alt_rate
+        
+        # how do we need to adjust our up acceleration to achieve the desired climb rate?
+        cmd_up_accel = self.vert_accel_PID.update(dt, alt_rate_error)
+        
+        # apply limits to vertical acceleration defined in "parameters" keyword
+        if cmd_up_accel > 0:
+            cmd_up_accel = min(cmd_up_accel, max_vert_accel)
+        else:
+            cmd_up_accel = max(cmd_up_accel, -max_vert_accel)
+        
+        # now we have our final vertical acceleration, use it to compute new pitch rate and pitch
+        pitch_rate = cmd_up_accel / speed
+        pitch = current_pitch + (pitch_rate * dt)
+        
+        # save the states
+        self.State.pitch_rate = pitch_rate
+        self.State.pitch = pitch
+        
+        # if we've been within our error tolerance for at least 1 second, we're done. Reset everything.
+        if self.altitude_within_error_tolerance_duration >= 1:
+            maneuver_finished = True
+            self.altitude_maneuver_in_progress = False
+            self.altitude_within_error_tolerance_duration = 0
+            self.State.pitch = 0.0
+            self.State.pitch_rate = 0.0    
+            self.climb_PID.reset()
+            self.vert_accel_PID.reset()
+            
+        return maneuver_finished    
+            
+                
     def write_traj(self, fp, numeric=False):
         ''' just writing the current contents of spatial_states to file fp
         
@@ -563,7 +890,7 @@ class Spatial(object):
             states.to_csv(fp, header=False, index=False)
     
     
-    def get_all_states(self, numeric=False):
+    def get_all_states(self, numeric=False, add_lla=False, enu_ref_lla=None):
         ''' return all states in numpy array or dataframe form
         
         Args:
@@ -581,13 +908,42 @@ class Spatial(object):
             flattened_states.append(State.get_full_state_list())
         
         if not numeric:
-            cols = ['time', 'east', 'north', 'up', 'east_vel', 'north_vel', 'up_vel', 'east_accel', 'north_accel',
-                    'up_accel', 'speed', 'yaw', 'pitch', 'roll', 'yaw_rate', 'pitch_rate', 'roll_rate', 'axial_accel',
+            cols = ['time', 'x', 'y', 'z', 'dx', 'dy', 'dz', 'ddx', 'ddy',
+                    'ddz', 'speed', 'yaw', 'pitch', 'roll', 'yaw_rate', 'pitch_rate', 'roll_rate', 'axial_accel',
                     'lateral_accel', 'vertical_accel']
+            
             
             states = DataFrame(flattened_states, columns=cols)
             states.insert(0, 'name', self.spatial_name)
             states.insert(0, 'id', self.spatial_num)
+            
+            if add_lla:
+                for row in states.itertuples():
+                    ecef = np.array([[row.x, row.y, row.z]]).T
+                    lla = xfrm.ecef_to_lla(ecef)
+                    states.loc[row.Index, 'LAT'] = r2d(lla[0,0])
+                    states.loc[row.Index, 'LON'] = r2d(lla[1,0])
+                    states.loc[row.Index, 'ALT'] = lla[2,0]
+            
+            if enu_ref_lla is not None:
+                ref_lla = np.zeros((3,1))
+                ref_lla[0,0] = d2r(enu_ref_lla[0])
+                ref_lla[1,0] = d2r(enu_ref_lla[1])
+                ref_lla[2,0] = enu_ref_lla[2]
+            
+                for row in states.itertuples():      
+                    ecef = np.array([[row.x, row.dx, row.ddx, row.y, row.dy, row.ddy, row.z, row.dz, row.ddz]]).T
+                    enu = xfrm.ecef_to_enu(ecef, ref_lla)
+                    states.loc[row.Index, 'east'] = enu[0,0]
+                    states.loc[row.Index, 'east_vel'] = enu[1,0]
+                    states.loc[row.Index, 'east_accel'] = enu[2,0]
+                    states.loc[row.Index, 'north'] = enu[3,0]
+                    states.loc[row.Index, 'north_vel'] = enu[4,0]
+                    states.loc[row.Index, 'north_accel'] = enu[5,0]
+                    states.loc[row.Index, 'up'] = enu[6,0]
+                    states.loc[row.Index, 'up_vel'] = enu[7,0]
+                    states.loc[row.Index, 'up_accel'] = enu[8,0]
+            
             return states
         else:
             states = DataFrame(flattened_states)
@@ -693,7 +1049,7 @@ class Spatial(object):
         else:
             raise("Method should be eithr 'propagate' or 'interp'")
     
-    def plot_states(self, directory=None):
+    def plot_states(self, directory=None, enu_ref_lla=(0.0, 0.0, 0.0)):
         ''' generate some informative plots about our trajectory
         
         Args:
@@ -715,16 +1071,45 @@ class Spatial(object):
         
         states = self.get_all_states()
         
+        ref_lla = np.zeros((3,1))
+        ref_lla[0,0] = d2r(enu_ref_lla[0])
+        ref_lla[1,0] = d2r(enu_ref_lla[1])
+        ref_lla[2,0] = enu_ref_lla[2]
+        for row in states.itertuples():
+            ecef = np.array([[row.x, row.y, row.z]]).T
+            lla = xfrm.ecef_to_lla(ecef)
+            states.loc[row.Index, 'LAT'] = r2d(lla[0,0])
+            states.loc[row.Index, 'LON'] = r2d(lla[1,0])
+            states.loc[row.Index, 'ALT'] = lla[2,0]
+            
+            ecef = np.array([[row.x, row.dx, row.ddx, row.y, row.dy, row.ddy, row.z, row.dz, row.ddz]]).T
+            enu = xfrm.ecef_to_enu(ecef, ref_lla)
+            states.loc[row.Index, 'east'] = enu[0,0]
+            states.loc[row.Index, 'east_vel'] = enu[1,0]
+            states.loc[row.Index, 'east_accel'] = enu[2,0]
+            states.loc[row.Index, 'north'] = enu[3,0]
+            states.loc[row.Index, 'north_vel'] = enu[4,0]
+            states.loc[row.Index, 'north_accel'] = enu[5,0]
+            states.loc[row.Index, 'up'] = enu[6,0]
+            states.loc[row.Index, 'up_vel'] = enu[7,0]
+            states.loc[row.Index, 'up_accel'] = enu[8,0]
+        
         fig1, ax = subplots()
         ax.set_xlabel('EAST')
         ax.set_ylabel('NORTH')
         ax.set_aspect('equal')
         ax.plot(states.east, states.north)
         
+        fig1a, ax = subplots()
+        ax.set_xlabel('LON')
+        ax.set_ylabel('LAT')
+        ax.set_aspect('equal')
+        ax.plot(states.LON, states.LAT)
+        
         fig2, ax = subplots()
         ax.set_xlabel('TIME')
-        ax.set_ylabel('UP')
-        ax.plot(states.time, states.up)
+        ax.set_ylabel('ALT')
+        ax.plot(states.time, states.ALT)
         
         fig3, (ax1, ax2, ax3, ax4) = subplots(nrows=4, sharex=True)
         ax4.set_xlabel('TIME')
@@ -757,7 +1142,8 @@ class Spatial(object):
     
         if directory is not None:
             fig1.savefig(os.path.join(directory, '{}_east_north.csv'.format(self.spatial_name)))
-            fig2.savefig(os.path.join(directory, '{}_time_up.csv'.format(self.spatial_name)))
+            fig1a.savefig(os.path.join(directory, '{}_lat_lon.csv'.format(self.spatial_name)))
+            fig2.savefig(os.path.join(directory, '{}_time_alt.csv'.format(self.spatial_name)))
             fig3.savefig(os.path.join(directory, '{}_veloctiy.csv'.format(self.spatial_name)))
             fig4.savefig(os.path.join(directory, '{}_acceleration.csv'.format(self.spatial_name)))
             fig5.savefig(os.path.join(directory, '{}_heading_pitch_angle.csv'.format(self.spatial_name)))
@@ -782,37 +1168,38 @@ class Spatial(object):
         for man_id in self.maneuvers:
             start = self.maneuvers[man_id]['time']
             stop = self.maneuvers[man_id]['finished_time']
+            finished = self.maneuvers[man_id]['finished']
             
-            states = self.get_all_states()
+            states = self.get_all_states(add_lla=True)
             
             for t in states.time.tolist():
-                if t < stop:
-                    continue
-                else:
-                    nearest_reported_time = t
+                nearest_reported_time = t
+                if t >= stop:
                     break
-            
+
             states = states[(states.time >= start) & (states.time <= nearest_reported_time)]
-            total_gs = max((states.east_accel**2 + states.north_accel**2 + states.up_accel**2)**0.5) / 9.81
+            total_gs = max((states.ddx**2 + states.ddy**2 + states.ddz**2)**0.5) / 9.81
             
             start_state = self.get_state(start)
             start_speed = start_state.speed
             start_heading = r2d(start_state.yaw)
-            start_pitch = r2d(start_state.pitch)
+            start_alt = xfrm.ecef_to_lla(start_state.get_position())[2,0]
             stop_state = self.get_state(nearest_reported_time)
             stop_speed = stop_state.speed
             stop_heading = r2d(stop_state.yaw)
-            stop_pitch = r2d(stop_state.pitch)
+            stop_alt = xfrm.ecef_to_lla(stop_state.get_position())[2,0]
             
-            
-            s += '\n\nManeuver {}\n'.format(man_id)
+            if finished:
+                s += '\n\nManeuver {}\n'.format(man_id)
+            else:
+                s += '\n\nManeuver {} (Incomplete)\n'.format(man_id)
             s += '\tStart Time: {:.2f}\n'.format(start)
             s += '\tStop Time: {:.2f}\n'.format(nearest_reported_time)
             s += '\tDuration: {:.2f}\n'.format(nearest_reported_time-start)
             s += '\tPeak Total Gs: {:.2f}\n'.format(total_gs)
             s += '\tStart/Stop Speed: {:.2f}/{:.2f}\n'.format(start_speed, stop_speed)
             s += '\tStart/Stop Heading: {:.2f}/{:.2f}\n'.format(start_heading, stop_heading)
-            s += '\tStart/Stop Pitch: {:.2f}/{:.2f}\n'.format(start_pitch, stop_pitch)
+            s += '\tStart/Stop Altitude: {:.2f}/{:.2f}\n'.format(start_alt, stop_alt)
     
         return s
             
@@ -832,24 +1219,32 @@ class Spatial(object):
 if __name__ == '__main__':
     
     players_path = os.path.realpath(__file__)
-    pydarsim_path = players_path[:players_path.rfind('\players')]
-    config_fp = os.path.join(pydarsim_path, 'test/test_spatials/target1.yaml')
-    csv_fp = os.path.join(pydarsim_path, 'test/test_spatials/target1_traj.yaml')
+    pydarsim_path = players_path[:players_path.rfind('\players')]      
     
+    
+    ''' Test Trajectories '''
+    config_file = 'straight_and_level'
+    # config_file = 'lazy_turn'
+    # config_file = 'lazy_turn_autopilot'
+    # config_file = 'fast_and_slow'
+    # config_file = 'fast_and_slow_autopilot'
+    # config_file = 'speedup'
+    # config_file = 'speedup_autopilot'
+    # config_file = 'turn_and_run_and_dive'
+    # config_file = 'turn_and_run_and_dive_autopilot'
+    # config_file = 'two_turns'
+    # config_file = 'two_turns_autopilot'
+    # config_file = 'up_and_down'
+    # config_file = 'up_and_down_autopilot'
+    
+    
+    ''' Run it '''
+    config_fp = os.path.join(pydarsim_path, 'test/test_spatials/{}.yaml'.format(config_file))
+    csv_fp = os.path.join(pydarsim_path, 'test/test_spatials/{}.csv'.format(config_file))
     spatial = Spatial(config_fp, process=True)
-    states = spatial.get_all_states()
+    states = spatial.get_all_states(add_lla=True, enu_ref_lla=(0.0, 0.0, 0.0))
     spatial.write_traj(csv_fp)
     spatial.plot_states()
     print(spatial)
     print(spatial.maneuver_info())
-    
-    config_fp2 = os.path.join(pydarsim_path, 'test/test_spatials/target1_10Hz.yaml')
-    csv_fp2 = os.path.join(pydarsim_path, 'test/test_spatials/target1_10Hz_traj.yaml')
-    
-    spatial2 = Spatial(config_fp2, process=True)
-    states2 = spatial2.get_all_states()
-    spatial2.write_traj(csv_fp2)
-    spatial2.plot_states()
-    print(spatial2)
-    print(spatial2.maneuver_info())
     

@@ -5,7 +5,6 @@ setup(
       name='pydarsim',
       version='0.1',
       packages=find_packages(),
-      license='MIT',
       description='Radar and Tracking Simulator',
       url='https://github.com/jbdriggers1/pydarsim',
       author='John B. Driggers',

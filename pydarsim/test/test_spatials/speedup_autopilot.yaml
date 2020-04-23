@@ -1,0 +1,25 @@
+info:
+    name: Target
+
+initial:
+    start_time: 0.0
+    stop_time: 200.0
+    latitude: 2.0
+    longitude: 0.0
+    altitude: 10000.0
+    heading: 180.0
+    pitch_angle: 0.0
+    speed: 300.0
+
+parameters:
+    update_rate: 0.1
+    max_lateral_gs: 1.0
+    max_vertical_gs: 1.0
+    max_gs: 3.0
+    autopilot: True
+    accel_time_const: 0.25
+
+maneuvers:
+    1:
+        time: 100.0
+        final_speed: 500

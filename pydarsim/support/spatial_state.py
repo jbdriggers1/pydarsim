@@ -123,4 +123,10 @@ class SpatialState(object):
                 self.vertical_accel]
     
     
+    def get_course(self):
+        return np.array([[self.speed],
+                         [self.yaw],
+                         [self.pitch]])
+    
+    
     
