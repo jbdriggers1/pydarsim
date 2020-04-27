@@ -1,0 +1,6 @@
+2020-04-27 14:57:51,313 - spatial - 52 - INFO       - SpatialEarth object number 2 initialized
+2020-04-27 14:57:51,318 - spatial - 208 - INFO       - SpatialEarth object Target, number 2 config processed.
+2020-04-27 14:57:51,319 - sim_master - 113 - INFO       - 1 Targets Initialized
+2020-04-27 14:57:51,319 - sim_master - 117 - INFO       - SimMaster id 1 destructed
+2020-04-27 14:57:51,319 - simple_radar - 79 - INFO       - SimpleRadar with sensor id 1 destructed
+2020-04-27 14:57:51,319 - sensor - 64 - INFO       - Sensor id 1 destructed

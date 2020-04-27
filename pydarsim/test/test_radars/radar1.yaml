@@ -1,0 +1,31 @@
+sensor: SimpleRadar
+name: Radar1
+update_interval: 1.0
+
+spatial_config: "C:/Users/John/Documents/Python_Scripts/pydarsim/pydarsim/test/test_radars/Radar1_spatial.yaml"
+
+detection_limits:
+    range_min: None
+    range_max: None
+    bearing_min: None
+    bearing_max: None
+    elevation_min: None
+    elevation_max: None
+    rdot_min: None
+    rdot_max: None
+    altitude_min: None
+    altitude_max: None
+
+detection_parameters:
+    range_error_mean: 0.0
+    range_error_sigma: 0.0
+    range_error_sigma_report: 0.0
+    bearing_error_mean: 0.0
+    bearing_error_sigma: 0.0
+    bearing_error_sigma_report: 0.0
+    elevation_error_mean: 0.0
+    elevation_error_sigma: 0.0
+    elevation_error_sigma_report: 0.0
+    rdot_error_mean: 0.0
+    rdot_error_sigma: 0.0
+    rdot_error_sigma_report: 0.0

@@ -1,0 +1,13 @@
+job_info:
+    name: test_job1
+    output_dir: "C:/Users/John/Documents/Python_Scripts/pydarsim/pydarsim/test/test_jobs"
+    sim_duration: 300
+    log_level: DEBUG
+    verbose: False
+
+players:
+    sensors:
+        - 'C:/Users/John/Documents/Python_Scripts/pydarsim/pydarsim/test/test_radars/Radar1.yaml'
+
+    targets:
+        - 'C:/Users/John/Documents/Python_Scripts/pydarsim/pydarsim/test/test_spatials/straight_and_level.yaml'

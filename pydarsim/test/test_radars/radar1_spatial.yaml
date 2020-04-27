@@ -1,19 +1,19 @@
 info:
-    name: Target
-    spatial_model: SpatialEarth
+    name: Radar1
+    model: SpatialEarth
 
 initial:
     start_time: 0.0
     stop_time: 200.0
-    latitude: 2.0
+    latitude: 0.0
     longitude: 0.0
-    altitude: 10000.0
-    heading: 180.0
+    altitude: 0.0
+    heading: 0.0
     pitch_angle: 0.0
-    speed: 300.0
+    speed: 0.0
 
 parameters:
-    update_rate: 0.1
+    update_rate: 1.0
     max_lateral_gs: 1.0
     max_vertical_gs: 1.0
     max_gs: 1.0
