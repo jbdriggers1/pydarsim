@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    tools.py
+        Just a random collections of common functions needed here and there
+
+#############################################################################'''
+
 
 import os
 import numpy as np

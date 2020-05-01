@@ -1,4 +1,52 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    simple_radar.py -
+        Simple, noise-up truth radar model. Requires a configuration yaml which
+        in turn points to a spatial yaml configuration describing the radars
+        trajectory.
+
+        Can specify mean error, std, reported covariance, and boundaries of
+        detection in RBED.
+
+        Format of configuration yaml:
+        (# comments are not necessary)
+
+~~~Start YAML~~~
+sensor: SimpleRadar  # sensor model by class name (SimpleRadar only one implemented right now)
+name: Radar1  # name assigned to radar (try to keep this consistent between filenames and sensor spatial)
+update_interval: 1.0  # in seconds
+
+spatial_config: "./test/test_jobs/Radar1_spatial.yaml"  # filepath to spatial config used to generate trajectory
+
+detection_limits:  # use None to set no limitation
+    range_min: None  # meters
+    range_max: None  # meters
+    bearing_min: None  # degrees, Min is left-most limit, Max is right-most limit (clockwise)
+    bearing_max: None  # degrees. Must define max if min defined and vice versa
+    elevation_min: None  # degrees. Must define max if min defined and vice versa
+    elevation_max: None  # degrees
+    rdot_min: None  # m/s (absolute)
+    rdot_max: None  # m/s (absolute)
+    altitude_min: None  # meters
+    altitude_max: None  # meters
+
+detection_parameters:
+    range_error_mean: 0.0  # meters
+    range_error_sigma: 0.0  # meters
+    range_error_sigma_report: 0.0  # meters
+    bearing_error_mean: 0.0  # mrad
+    bearing_error_sigma: 0.0  # mrad
+    bearing_error_sigma_report: 0.0  # mrad
+    elevation_error_mean: 0.0  # mrad
+    elevation_error_sigma: 0.0  # mrad
+    elevation_error_sigma_report: 0.0  # mrad
+    rdot_error_mean: 0.0  # m/s
+    rdot_error_sigma: 0.0  # m/s
+    rdot_error_sigma_report: 0.0  # m/s
+~~~Stop YAML~~~
+
+
+#############################################################################'''
 
 import sys
 import os
@@ -62,12 +110,12 @@ class SimpleRadar(sensor.Sensor):
         self.range_error_mean = dp['range_error_mean']
         self.range_error_sigma = dp['range_error_sigma']
         self.range_error_sigma_report = dp['range_error_sigma_report']
-        self.bearing_error_mean = dp['bearing_error_mean']
-        self.bearing_error_sigma = dp['bearing_error_sigma']
-        self.bearing_error_sigma_report = dp['bearing_error_sigma_report']
-        self.elevation_error_mean = dp['elevation_error_mean']
-        self.elevation_error_sigma = dp['elevation_error_sigma']
-        self.elevation_error_sigma_report = dp['elevation_error_sigma_report']
+        self.bearing_error_mean = dp['bearing_error_mean'] / 1000
+        self.bearing_error_sigma = dp['bearing_error_sigma'] / 1000
+        self.bearing_error_sigma_report = dp['bearing_error_sigma_report'] / 1000
+        self.elevation_error_mean = dp['elevation_error_mean'] / 1000
+        self.elevation_error_sigma = dp['elevation_error_sigma'] / 1000
+        self.elevation_error_sigma_report = dp['elevation_error_sigma_report'] / 1000
         self.rdot_error_mean = dp['rdot_error_mean']
         self.rdot_error_sigma = dp['rdot_error_sigma']
         self.rdot_error_sigma_report = dp['rdot_error_sigma_report']
@@ -77,6 +125,7 @@ class SimpleRadar(sensor.Sensor):
 
 
     def perform_detections_on_target(self, target_spatial):
+        ''' given a Spatial object, perform detections on it '''
 
         detections = []
         target_ended = False
@@ -109,6 +158,7 @@ class SimpleRadar(sensor.Sensor):
 
 
     def form_truth_into_detection(self, sensor_spatial_state, target_spatial_state):
+        ''' given the sensor's and target's current spatial states, form the target spatial state into a detection '''
 
         assert np.isclose(sensor_spatial_state.time, sensor_spatial_state.time), "These states do not go together in time"
 
@@ -168,6 +218,7 @@ class SimpleRadar(sensor.Sensor):
 
 
     def detection_with_limits(self, det):
+        ''' check if the detection falls within the specified sensor limitation/boundaries '''
 
         if det.x < self.range_min:
             return False

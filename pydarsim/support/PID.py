@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 20 16:01:57 2020
+'''#############################################################################
+    PID.py -
+        Create PID look with gains kp, ki, and kd. Update by calling update()
+        and passing time step since last update and error of update from target
+        value.
 
-@author: John
-"""
+#############################################################################'''
 
 
 class PID:

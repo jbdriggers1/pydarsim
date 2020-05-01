@@ -1,4 +1,34 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    sim_master.py -
+        Main class that integrates all simulation players and supporting
+        functionality. sim_driver creates an instance of SimMaster with the
+        given yaml configuration. SimMaster inits sensor objects, target objects,
+        the logger, calls on detections to be generated, calls on trajectories
+        to be generated, creates output directory and saves logs to that
+        directory.
+
+        Example YAML (# comments not needed)
+
+~~~~~~Start YAML~~~~~~
+job_info:
+    name: test_job1  # name of directory created to put all output in
+    output_dir: "./test/test_jobs"  # where this directory will be put
+    sim_duration: 300  # seconds, duration of simulation
+    log_level: DEBUG  # level above which to log. DEBUG, INFO, WARNING, ERROR
+    verbose: True  # print log data to console if True
+
+# this example has 1 sensor and 1 target
+players:  # add players in given dash (-) format, on a new line and indented
+    sensors:  # paths to sensor config YAMLs define new sensors
+        - './test/test_jobs/Radar1.yaml'
+
+    targets:  # paths to spatial YAMLs define new targets
+        - './test/test_jobs/straight_and_level.yaml'
+~~~~~~Stop YAML~~~~~~
+
+#############################################################################'''
+
 
 import os
 import sys

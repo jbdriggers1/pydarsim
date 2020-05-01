@@ -1,4 +1,31 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    sim_driver.py -
+        Main driver of the simulation. This is what is called to kick off the
+        whole thing. In a python environment with all the necessary packages,
+        call 'python sim_driver.py <path to job config yaml>' to run the sim.
+
+        Format of configuration yaml: (# comments not necessary)
+
+~~~~~~Start YAML~~~~~~
+job_info:
+    name: test_job1  # name of directory created to put all output in
+    output_dir: "./test/test_jobs"  # where this directory will be put
+    sim_duration: 300  # seconds, duration of simulation
+    log_level: DEBUG  # level above which to log. DEBUG, INFO, WARNING, ERROR
+    verbose: True  # print log data to console if True
+
+# this example has 1 sensor and 1 target
+players:  # add players in given dash (-) format, on a new line and indented
+    sensors:  # paths to sensor config YAMLs define new sensors
+        - './test/test_jobs/Radar1.yaml'
+
+    targets:  # paths to spatial YAMLs define new targets
+        - './test/test_jobs/straight_and_level.yaml'
+~~~~~~Stop YAML~~~~~~
+
+#############################################################################'''
+
 
 import os
 import sys

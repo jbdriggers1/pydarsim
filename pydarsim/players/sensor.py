@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    sensor.py -
+        Abstract Sensor Classes. Any sensor integrated into pydarsim must
+        inherit from Sensor and implement the abstract methods.
+#############################################################################'''
 
 import logging
 

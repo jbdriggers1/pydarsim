@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    spatial_state.py -
+        Defines SpatialState class for conveniently created and calling data
+        commonly needed when dealing with spatial data. Currently xfrm is not
+        integrated into this class which would allow for simple coordinate
+        transformations.
+
+#############################################################################'''
+
 
 import numpy as np
 

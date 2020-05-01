@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    messages.py -
+        Define format of "messages" so various players can have consistent
+        formatting
+
+    Current messages:
+        Detection
+
+#############################################################################'''
+
 
 import numpy as np
 

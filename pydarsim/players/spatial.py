@@ -1,4 +1,49 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    spatial.py -
+        Spatial classes to generate trajectories (for targets or sensors or
+        whatever). Only one generated now is SpatialEarth. Generates constant
+        altitude targets with speed, heading, and altitude maneuvers. Requires
+        configuration yaml for define parameters of trajectory.
+
+        Format of configuration yaml:
+        (# comments are not necessary)
+
+~~~~~~Start YAML~~~~~~
+info:
+    name: Target  # string name of Spatial entity to use
+
+initial:  # initial location and kinematic data
+    start_time: 0.0  # seconds
+    stop_time: 300.0  # seconds
+    latitude: 2.0  # degrees
+    longitude: 0.0  # degrees
+    altitude: 10000.0  # meters
+    heading: 180.0  # degrees (0 to 360)
+    pitch_angle: 0.0  # degrees (just leave at 0)
+    speed: 300.0  # m/s
+
+parameters:  # some kinematic limitations
+    update_rate: 0.1  # reported state rate (internally generated at 200 Hz)
+    max_lateral_gs: 3.0  # Gs, affects heading change maneuvers
+    max_vertical_gs: 3.0 # Gs, affects altitude maneuvers
+    max_gs: 3.0  # Gs, affects speed maneuvers
+    autopilot: True  # True For PD loop method of maneuvers (preferred True)
+    accel_time_const: 0.25  # smaller for more abrupt accelerations, default 0.25
+
+# speed, heading, and altitude maneuvers in a single maneuver are okay, but
+# try not to overlap consecutive maneuvers (1: needs to finish before 2: starts)
+maneuvers:  # single maneuver example, add more maneuvers with 2:, 3:, etc...
+    1:
+        time: 100.0  # time when maneuver starts (s)
+        final_speed: 500.0  # speed at end of maneuver (delete line if no speed change desired)
+        final_heading: 0.0  # degrees, heading at end of maneuver (delete line if no heading change desired)
+        final_altitude: 5000  # meters, altitude at end of maneuver (delete line if no altitude change desired)
+        climb_rate: 50  # m/s, climb or descent rate limitation
+~~~~~~Stop YAML~~~~~~
+
+#############################################################################'''
+
 
 import os
 import numpy as np

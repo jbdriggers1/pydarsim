@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 24 10:04:06 2020
+'''#############################################################################
+    xfrm.py -
+        Coordinate transformation functions.
 
-@author: John
-"""
+        Need to generalize into a class and integrate with spatial state possibly.
+
+        List of transformation implemented:
+            rbe_to_enu()
+            enu_to_rbe()
+            rbe_to_enu_cov() (only position)
+            ecef_to_lla()
+            lla_to_ecef()
+            ecef_to_enu()
+            enu_to_ecef()
+            ecef_to_rbe()
+            rbe_to_ecef()
+
+#############################################################################'''
 
 
 from numpy import sin, cos, arctan2, arcsin, array, nan_to_num, matmul, identity, zeros, kron, sqrt, arccos, newaxis, eye, column_stack

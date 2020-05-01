@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
+'''#############################################################################
+    my_logging.py -
+        Define how log is initialized. Currently implemented is console and
+        single file logging. This method works but could be made better.
 
-''' This doesn't seem right... '''
+        A single logger is created by calling configure_logger in any file, then
+        any file invoked afterwards is required to getLogger(<name>) in order
+        to log to the same master file and console.
+
+#############################################################################'''
+
 
 import logging
 import logging.config
