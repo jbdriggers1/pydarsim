@@ -76,3 +76,11 @@ def map_pi_to_pi(angle):
     elif angle < -np.pi:
         angle += 2*np.pi
     return angle
+
+
+def between_angles(a, start, stop):
+    ''' check if a is between start and stop angles (radians) '''
+
+    stop = stop - start + 2*np.pi if (stop - start) < 0.0 else stop - start
+    a = a - start + 2*np.pi if (a - start) < 0.0 else a - start
+    return a <= stop

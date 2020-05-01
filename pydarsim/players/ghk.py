@@ -13,7 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-class GHK(object):
+class GHK:
 
 
     def __init__(self, xp0, t0, use_accel=True, g=None, h=None, k=None, eta=None, dt_limit=None):
@@ -45,32 +45,32 @@ class GHK(object):
 
     def update(self, xm, t1):
 
-        
+
         dt = t1 - self.t0  # get time differnece simple last update
-        
+
         state = np.zeros(self.xp0.shape)  # empty state
-        
+
         ind_mul = 3 if self.use_accel else 2  # index multiplier depending on gh or ghk
-        
+
         '''   Initialization Process  (not sure about this...) '''
-            
+
         # first update
         if self.i == 0:
             self.obs_dim = xm.shape[0]  # number of dimensions in the observation
-            
+
             # fill in first state positions with obs positions
             for index in range(self.obs_dim):
                 state[index*ind_mul, 0] = xm[index, 0]
-                
+
             # fill in velocities with 0
             for index in range(self.obs_dim):
                 state[(index*ind_mul)+1, 0] = 0
-            
+
             if self.use_accel:
                 # fill in accelerations with 0
                 for index in range(self.obs_dim):
                     state[(index*ind_mul)+2, 0] = 0
-            
+
             # update state and push to list
             self.i += 1  # increment update counter
             self.t0 = t1
@@ -78,30 +78,30 @@ class GHK(object):
             self.states.append((t1, state))  # time and state
             self.r = np.zeros(xm.shape)
             return self.xp0, self.r
-        
+
         # second update
         elif self.i == 1:
-            
+
             if self.dt_limit is not None and dt < self.dt_limit:
                 return self.xp0, self.r
-            
+
             assert(xm.shape[0] == self.obs_dim)
-            
+
             # fill in state positions with obs positions
             for index in range(self.obs_dim):
                 state[index*ind_mul, 0] = xm[index, 0]
-                
+
             # fill in velocities (use previous vel to compute range rate)
             for index in range(self.obs_dim):
                 d_pos = state[(index*ind_mul), 0] - self.xp0[(index*ind_mul), 0]
                 vel = d_pos / dt
                 state[(index*ind_mul)+1, 0] = vel
-            
+
             if self.use_accel:
                 # fill in accelerations with 0
                 for index in range(self.obs_dim):
                     state[(index*ind_mul)+2, 0] = 0
-            
+
             # update state and push to list
             self.i += 1  # increment update counter
             self.t0 = t1
@@ -109,37 +109,37 @@ class GHK(object):
             self.states.append((t1, state))  # time and state
             self.r = np.zeros(xm.shape)
             return self.xp0, self.r
-        
+
         # third update
         elif self.i == 2 and self.use_accel:
-            
+
             if self.dt_limit is not None and dt < self.dt_limit:
                 return self.xp0, self.r
-            
+
             assert(xm.shape[0] == self.obs_dim)
-            
+
             # fill in state positions with obs positions
             for index in range(self.obs_dim):
                 state[index*ind_mul, 0] = xm[index, 0]
-                
+
             # fill in velocities (use previous vel to compute range rate)
             for index in range(self.obs_dim):
                 d_pos = state[(index*ind_mul), 0] - self.xp0[(index*ind_mul), 0]
                 vel = d_pos / dt
                 state[(index*ind_mul)+1, 0] = vel
-            
+
             # fill in accelerations
             for index in range(self.obs_dim):
                 _, first_state = self.states[-2]
                 _, second_state = self.states[-1]
-                
+
 #                num = state[(index*ind_mul), 0] + first_state[(index*ind_mul), 0] - 2*second_state[(index*ind_mul), 0]
 #                accel = num / (dt**2)
-                
+
                 d_vel = state[(index*ind_mul)+1, 0] - self.xp0[(index*ind_mul)+1, 0]
                 accel = d_vel / dt
                 state[(index*ind_mul)+2, 0] = accel
-            
+
             # update state and push to list
             self.i += 1  # increment update counter
             self.t0 = t1
@@ -147,17 +147,17 @@ class GHK(object):
             self.states.append((t1, state))  # time and state
             self.r = np.zeros(xm.shape)
             return self.xp0, self.r
-                    
-        
-        '''   End Initialization Process   '''
-        
 
-        
+
+        '''   End Initialization Process   '''
+
+
+
         assert(xm.shape[0] == self.obs_dim)  # number of dimensions in observation passed
                                              # needs to be consistent with intial obs.
-        
+
         self.t0 = t1
-        
+
         # if dt is small, return to previous state and recompute ghk, choose state with smaller residual (?)
         if self.dt_limit is not None and dt < self.dt_limit:
             prev_dt = 0
@@ -170,52 +170,52 @@ class GHK(object):
                 except IndexError:
                     # no previous states with dt > 0.5 exist
                     return self.xp0, self.r
-            
+
             phi = GHK.make_phi_matrix(prev_dt, xm.shape[0], self.use_accel)  # get transition matrix based on dt
             pred_state = np.matmul(phi, prev_state)  # propogate state prediction forward
-            
+
             if self.use_accel:
                 pred_pos = pred_state[0::3]  # get predicted state positions
             else:
                 pred_pos = pred_state[0::2]
             new_res = xm - pred_pos  # calculate residual
-            
+
             if new_res < self.r:
                 gain = GHK.make_gain_matrix(prev_dt, self.g, self.h, self.k)
                 temp = gain * new_res.flatten()
                 temp = np.reshape(temp, (temp.size, 1), order='F')  # stack the columns into nx1 vector
                 new_pred = pred_state + temp  # add prediction to gain-adjusted residual
-                
+
                 self.xp0 = new_pred
                 self.states.append((t1, self.xp0))
                 self.i += 1  # increment update counter
                 return self.xp0, self.r
-            
+
             else:
                 return self.xp0, self.r
-                
-        
+
+
         else:
 
             phi = GHK.make_phi_matrix(dt, xm.shape[0], self.use_accel)  # get transition matrix based on dt
             self.xp1 = np.matmul(phi, self.xp0)  # propogate state prediction forward
-    
+
             if self.use_accel:
                 pred_pos = self.xp1[0::3]  # get predicted state positions
             else:
                 pred_pos = self.xp1[0::2]
             self.r = xm - pred_pos  # calculate residual
-    
+
             gain = GHK.make_gain_matrix(dt, self.g, self.h, self.k)
             temp = gain * self.r.flatten()
             temp = np.reshape(temp, (temp.size, 1), order='F')  # stack the columns into nx1 vector
             new_pred = self.xp1 + temp  # add prediction to gain-adjusted residual
-    
+
             self.xp0 = new_pred  # new prediction becomes old (current)
             self.states.append((t1, self.xp0))
             self.i += 1  # increment update counter
-            
-    
+
+
             return self.xp0, self.r
 
 

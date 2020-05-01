@@ -5,7 +5,7 @@ import logging
 import pydarsim.players.spatial as spatial
 
 
-class SensorFactory(object):
+class SensorFactory:
     ''' For Generating the Requested Sensor Model'''
 
     @staticmethod
@@ -17,7 +17,7 @@ class SensorFactory(object):
             raise TypeError('No sensor model {} found'.format(sensor_model))
 
 
-class Sensor(object):  # make abstract with ABC?
+class Sensor:  # make abstract with ABC?
     ''' Abstract Sensor Class. Sensor model must inherit from this '''
 
     sensor_id = 0
@@ -35,6 +35,10 @@ class Sensor(object):  # make abstract with ABC?
 
     def process_config(self):
         ''' specific sensor models must handle this. should i make this an abstract method? '''
+        pass
+
+    def perform_detections_on_target(self, target_spatial):
+        ''' sensor model specific, abstract method '''
         pass
 
 

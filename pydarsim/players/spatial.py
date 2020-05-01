@@ -7,6 +7,7 @@ from numpy import rad2deg as r2d
 from pandas import DataFrame
 from copy import deepcopy
 import logging
+import pandas as pd
 
 import pydarsim.support.tools as tools
 import pydarsim.support as support
@@ -16,7 +17,8 @@ import pydarsim.support.PID as PID
 from pdb import set_trace
 
 
-class SpatialFactory(object):
+class SpatialFactory:
+    ''' Generate requested spatial model '''
 
     @staticmethod
     def init_spatial_model(spatial_model):
@@ -26,7 +28,7 @@ class SpatialFactory(object):
             raise TypeError('No spatial model {} found'.format(spatial_model))
 
 
-class SpatialEarth(object):
+class SpatialEarth:
     '''
     Class for generating simple spatial trajectories with parameters defined in a
     yaml configuration file. Supported maneuvers are simple heading change, speedup,
@@ -853,7 +855,7 @@ class SpatialEarth(object):
         return maneuver_finished
 
 
-    def write_traj(self, fp, numeric=False):
+    def write_traj(self, fp, **kwargs):
         ''' just writing the current contents of spatial_states to file fp
 
         Args:
@@ -867,11 +869,13 @@ class SpatialEarth(object):
             None
         '''
 
-        states = self.get_all_states(numeric)
-        if not numeric:
-            states.to_csv(fp)
-        else:
+        states = self.get_all_states(**kwargs)
+        if isinstance(states, pd.core.frame.DataFrame):
+            states.to_csv(fp, index=False)
+        elif isinstance(state, np.ndarray):
             states.to_csv(fp, header=False, index=False)
+        else:
+            raise Exception("What type is states? Not DataFrame of ndarray")
 
         SpatialEarth.log.info('SpatialEarth object {} trajectory written to {}'.format(self.spatial_name, fp))
 
@@ -938,7 +942,7 @@ class SpatialEarth(object):
             return states
 
 
-    def get_state(self, prop_time, method='interp', prop_rate=0.001):
+    def get_state(self, prop_time, method='interp', prop_rate=0.005):
         ''' For getting a state at the specified prop time.
 
         Args:
@@ -951,7 +955,8 @@ class SpatialEarth(object):
         '''
 
         # prop time requested must be a time when spatial existed
-        assert (prop_time >= self.spatial_states[0].time) and (prop_time <= self.spatial_states[-1].time), 'SpatialEarth id {} does not exist at time {}'.format(self.spatial_id, prop_time)
+        if (prop_time < self.spatial_states[0].time) or (prop_time > self.spatial_states[-1].time):
+            return 0
 
         # linearly interpolate between states at requested time
         if method == 'interp':

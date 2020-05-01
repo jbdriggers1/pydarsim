@@ -1,6 +1,341 @@
-2020-04-27 14:57:51,313 - spatial - 52 - INFO       - SpatialEarth object number 2 initialized
-2020-04-27 14:57:51,318 - spatial - 208 - INFO       - SpatialEarth object Target, number 2 config processed.
-2020-04-27 14:57:51,319 - sim_master - 113 - INFO       - 1 Targets Initialized
-2020-04-27 14:57:51,319 - sim_master - 117 - INFO       - SimMaster id 1 destructed
-2020-04-27 14:57:51,319 - simple_radar - 79 - INFO       - SimpleRadar with sensor id 1 destructed
-2020-04-27 14:57:51,319 - sensor - 64 - INFO       - Sensor id 1 destructed
+2020-04-30 19:43:03,501 - sim_master - 78 - INFO       - SimMaster id 1 initialized
+2020-04-30 19:43:03,501 - sim_master - 79 - INFO       - SimMaster id 1 processing config yaml at C:\Users\John\Documents\Python_Scripts\pydarsim\pydarsim\test\test_jobs\test_job1.yaml
+2020-04-30 19:43:03,502 - sim_master - 80 - INFO       - Created job dir at ./test/test_jobs\test_job1
+2020-04-30 19:43:03,502 - sim_master - 81 - INFO       - Config processed for job test_job1
+2020-04-30 19:43:03,502 - sim_master - 87 - INFO       - Initializing Sensors
+2020-04-30 19:43:03,509 - sensor - 33 - INFO       - Sensor id 1 initialized
+2020-04-30 19:43:03,510 - simple_radar - 26 - INFO       - SimpleRadar with sensor id 1 initialized
+2020-04-30 19:43:03,510 - simple_radar - 32 - INFO       - Processing config for SimpleRadar id 1
+2020-04-30 19:43:03,515 - simple_radar - 36 - INFO       - Loaded config from ./test/test_jobs/Radar1.yaml
+2020-04-30 19:43:03,518 - simple_radar - 76 - INFO       - Config processed for SimpleRadar id 1
+2020-04-30 19:43:03,519 - spatial - 54 - INFO       - SpatialEarth object number 1 initialized
+2020-04-30 19:43:03,519 - sensor - 53 - INFO       - Spatial for Sensor ID 1 initialized
+2020-04-30 19:43:03,523 - spatial - 210 - INFO       - SpatialEarth object Radar1, number 1 config processed.
+2020-04-30 19:43:03,523 - sensor - 64 - INFO       - Spatial for Sensor ID 1 processed
+2020-04-30 19:43:03,525 - sim_master - 106 - INFO       - 1 Sensors Initialized
+2020-04-30 19:43:03,525 - sim_master - 112 - INFO       - Initializing Targets
+2020-04-30 19:43:03,529 - spatial - 54 - INFO       - SpatialEarth object number 2 initialized
+2020-04-30 19:43:03,533 - spatial - 210 - INFO       - SpatialEarth object Target, number 2 config processed.
+2020-04-30 19:43:03,534 - sim_master - 128 - INFO       - 1 Targets Initialized
+2020-04-30 19:43:03,534 - sim_master - 134 - INFO       - Generating sensor spatial trajectories
+2020-04-30 19:43:03,534 - spatial - 230 - INFO       - Generating SpatialEarth object Radar1 trajectory
+2020-04-30 19:43:18,440 - spatial - 245 - INFO       - SpatialEarth object Radar1 trajectory generated
+2020-04-30 19:43:18,800 - spatial - 880 - INFO       - SpatialEarth object Radar1 trajectory written to ./test/test_jobs\test_job1\Sensor_Radar1_spatial.csv
+2020-04-30 19:43:18,801 - sim_master - 140 - INFO       - Generated 1 sensor trajectories
+2020-04-30 19:43:18,801 - sim_master - 146 - INFO       - Generating target spatial trajectories
+2020-04-30 19:43:18,802 - spatial - 230 - INFO       - Generating SpatialEarth object Target trajectory
+2020-04-30 19:43:32,460 - spatial - 245 - INFO       - SpatialEarth object Target trajectory generated
+2020-04-30 19:43:35,420 - spatial - 880 - INFO       - SpatialEarth object Target trajectory written to ./test/test_jobs\test_job1\Target_Target_spatial.csv
+2020-04-30 19:43:35,420 - sim_master - 152 - INFO       - Generated 1 target trajectories
+2020-04-30 19:43:35,420 - sim_master - 166 - INFO       - Starting detection processes
+2020-04-30 19:43:35,420 - sim_master - 169 - INFO       - Detection Started - Sensor: Radar1, Target: Target
+2020-04-30 19:43:35,422 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 0.0 | Range: 221538.49026324903 | Az: 0.0 | El: 0.027694015704851083 | Rdot: -299.4123666587533
+2020-04-30 19:43:35,423 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 1.0 | Range: 221239.07825072258 | Az: 0.0 | El: 0.0277788148026632 | Rdot: -299.4116578061155
+2020-04-30 19:43:35,425 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 2.0 | Range: 220939.66694437762 | Az: 0.0 | El: 0.027863779666361665 | Rdot: -299.4109498536604
+2020-04-30 19:43:35,427 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 3.0 | Range: 220640.2563477598 | Az: 0.0 | El: 0.02794891097032437 | Rdot: -299.41023834659
+2020-04-30 19:43:35,432 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 4.0 | Range: 220340.8464644335 | Az: 0.0 | El: 0.028034209392738596 | Rdot: -299.4095232664874
+2020-04-30 19:43:35,439 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 5.0 | Range: 220041.43729797893 | Az: 0.0 | El: 0.02811967561525197 | Rdot: -299.408804594815
+2020-04-30 19:43:35,446 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 6.0 | Range: 219742.0288519978 | Az: 0.0 | El: 0.028205310323452082 | Rdot: -299.40808231290373
+2020-04-30 19:43:35,451 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 7.0 | Range: 219442.62113011078 | Az: 0.0 | El: 0.028291114206621337 | Rdot: -299.4073564019586
+2020-04-30 19:43:35,459 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 8.0 | Range: 219143.21413595372 | Az: 0.0 | El: 0.028377087957518476 | Rdot: -299.4066268430616
+2020-04-30 19:43:35,464 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 9.0 | Range: 218843.80787318829 | Az: 0.0 | El: 0.028463232273185923 | Rdot: -299.4058936171556
+2020-04-30 19:43:35,469 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 10.0 | Range: 218544.40234548875 | Az: 0.0 | El: 0.02854954785419217 | Rdot: -299.40515670505846
+2020-04-30 19:43:35,477 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 11.0 | Range: 218244.99755655063 | Az: 0.0 | El: 0.028636035404949745 | Rdot: -299.40441608745675
+2020-04-30 19:43:35,489 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 12.0 | Range: 217945.59351008912 | Az: 0.0 | El: 0.028722695633683237 | Rdot: -299.40367174490535
+2020-04-30 19:43:35,503 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 13.0 | Range: 217646.19020983938 | Az: 0.0 | El: 0.028809529252690425 | Rdot: -299.4029236578216
+2020-04-30 19:43:35,511 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 14.0 | Range: 217346.787659556 | Az: 0.0 | El: 0.028896536978076703 | Rdot: -299.40217180649057
+2020-04-30 19:43:35,522 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 15.0 | Range: 217047.38586301237 | Az: 0.0 | El: 0.028983719529842134 | Rdot: -299.4014161710622
+2020-04-30 19:43:35,537 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 16.0 | Range: 216747.98482400386 | Az: 0.0 | El: 0.02907107763212302 | Rdot: -299.40065673154623
+2020-04-30 19:43:35,545 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 17.0 | Range: 216448.58454634272 | Az: 0.0 | El: 0.029158612012871288 | Rdot: -299.39989346781783
+2020-04-30 19:43:35,553 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 18.0 | Range: 216149.1850338663 | Az: 0.0 | El: 0.029246323404264807 | Rdot: -299.39912635960854
+2020-04-30 19:43:35,563 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 19.0 | Range: 215849.7862904267 | Az: 0.0 | El: 0.029334212542307725 | Rdot: -299.3983553865151
+2020-04-30 19:43:35,576 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 20.0 | Range: 215550.3883198997 | Az: 0.0 | El: 0.029422280167302972 | Rdot: -299.39758052798703
+2020-04-30 19:43:35,586 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 21.0 | Range: 215250.99112618074 | Az: 0.0 | El: 0.029510527023460575 | Rdot: -299.3968017633355
+2020-04-30 19:43:35,597 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 22.0 | Range: 214951.59471318708 | Az: 0.0 | El: 0.029598953859343524 | Rdot: -299.39601907172346
+2020-04-30 19:43:35,608 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 23.0 | Range: 214652.19908485652 | Az: 0.0 | El: 0.029687561427578224 | Rdot: -299.39523243217116
+2020-04-30 19:43:35,622 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 24.0 | Range: 214352.8042451456 | Az: 0.0 | El: 0.029776350484895353 | Rdot: -299.39444182355334
+2020-04-30 19:43:35,635 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 25.0 | Range: 214053.410198037 | Az: 0.0 | El: 0.02986532179252155 | Rdot: -299.3936472245929
+2020-04-30 19:43:35,647 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 26.0 | Range: 213754.0169475283 | Az: 0.0 | El: 0.029954476115552353 | Rdot: -299.39284861387006
+2020-04-30 19:43:35,662 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 27.0 | Range: 213454.62449764452 | Az: 0.0 | El: 0.030043814223742693 | Rdot: -299.39204596980875
+2020-04-30 19:43:35,676 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 28.0 | Range: 213155.23285242805 | Az: 0.0 | El: 0.030133336890981077 | Rdot: -299.39123927068425
+2020-04-30 19:43:35,690 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 29.0 | Range: 212855.84201594573 | Az: 0.0 | El: 0.03022304489543881 | Rdot: -299.3904284946211
+2020-04-30 19:43:35,707 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 30.0 | Range: 212556.45199228634 | Az: 0.0 | El: 0.030312939019993657 | Rdot: -299.38961361958314
+2020-04-30 19:43:35,722 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 31.0 | Range: 212257.06278555916 | Az: 0.0 | El: 0.030403020051579688 | Rdot: -299.38879462338525
+2020-04-30 19:43:35,739 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 32.0 | Range: 211957.6743998958 | Az: 0.0 | El: 0.030493288781578087 | Rdot: -299.3879714836862
+2020-04-30 19:43:35,754 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 33.0 | Range: 211658.28683945298 | Az: 0.0 | El: 0.03058374600623015 | Rdot: -299.38714417797917
+2020-04-30 19:43:35,769 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 34.0 | Range: 211358.90010840684 | Az: 0.0 | El: 0.030674392525768646 | Rdot: -299.38631268360746
+2020-04-30 19:43:35,790 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 35.0 | Range: 211059.51421095646 | Az: 0.0 | El: 0.030765229145312212 | Rdot: -299.3854769777476
+2020-04-30 19:43:35,806 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 36.0 | Range: 210760.12915132556 | Az: 0.0 | El: 0.030856256674389293 | Rdot: -299.3846370374163
+2020-04-30 19:43:35,825 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 37.0 | Range: 210460.74493375942 | Az: 0.0 | El: 0.03094747592712821 | Rdot: -299.3837928394679
+2020-04-30 19:43:35,845 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 38.0 | Range: 210161.3615625297 | Az: 0.0 | El: 0.03103888772250052 | Rdot: -299.3829443605871
+2020-04-30 19:43:35,864 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 39.0 | Range: 209861.97904192706 | Az: 0.0 | El: 0.031130492883915117 | Rdot: -299.3820915772966
+2020-04-30 19:43:35,880 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 40.0 | Range: 209562.5973762686 | Az: 0.0 | El: 0.03122229223956907 | Rdot: -299.3812344659507
+2020-04-30 19:43:35,900 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 41.0 | Range: 209263.21656989423 | Az: 0.0 | El: 0.03131428662243341 | Rdot: -299.38037300273305
+2020-04-30 19:43:35,920 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 42.0 | Range: 208963.8366271671 | Az: 0.0 | El: 0.031406476869976 | Rdot: -299.37950716366174
+2020-04-30 19:43:35,939 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 43.0 | Range: 208664.4575524757 | Az: 0.0 | El: 0.03149886382482148 | Rdot: -299.378636924577
+2020-04-30 19:43:35,961 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 44.0 | Range: 208365.0793502312 | Az: 0.0 | El: 0.03159144833422367 | Rdot: -299.3777622611483
+2020-04-30 19:43:35,981 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 45.0 | Range: 208065.70202487108 | Az: 0.0 | El: 0.03168423125034092 | Rdot: -299.37688314887066
+2020-04-30 19:43:36,005 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 46.0 | Range: 207766.32558085577 | Az: 0.0 | El: 0.03177721343034268 | Rdot: -299.3759995630596
+2020-04-30 19:43:36,024 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 47.0 | Range: 207466.95002267236 | Az: 0.0 | El: 0.03187039573620698 | Rdot: -299.3751114788558
+2020-04-30 19:43:36,048 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 48.0 | Range: 207167.57535483214 | Az: 0.0 | El: 0.03196377903507219 | Rdot: -299.374218871216
+2020-04-30 19:43:36,072 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 49.0 | Range: 206868.20158186922 | Az: 0.0 | El: 0.03205736419872274 | Rdot: -299.37332171492403
+2020-04-30 19:43:36,095 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 50.0 | Range: 206568.82870834484 | Az: 0.0 | El: 0.03215115210420372 | Rdot: -299.37241998457586
+2020-04-30 19:43:36,123 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 51.0 | Range: 206269.45673884742 | Az: 0.0 | El: 0.032245143633919504 | Rdot: -299.3715136545784
+2020-04-30 19:43:36,145 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 52.0 | Range: 205970.08567798976 | Az: 0.0 | El: 0.03233933967495961 | Rdot: -299.37060269916077
+2020-04-30 19:43:36,172 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 53.0 | Range: 205670.71553040924 | Az: 0.0 | El: 0.03243374111989983 | Rdot: -299.36968709235896
+2020-04-30 19:43:36,197 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 54.0 | Range: 205371.34630076913 | Az: 0.0 | El: 0.03252834886610145 | Rdot: -299.3687668080268
+2020-04-30 19:43:36,224 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 55.0 | Range: 205071.97799376238 | Az: 0.0 | El: 0.0326231638165968 | Rdot: -299.3678418198193
+2020-04-30 19:43:36,251 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 56.0 | Range: 204772.61061410513 | Az: 0.0 | El: 0.03271818687948702 | Rdot: -299.3669121012031
+2020-04-30 19:43:36,274 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 57.0 | Range: 204473.24416654147 | Az: 0.0 | El: 0.03281341896819612 | Rdot: -299.3659776254501
+2020-04-30 19:43:36,306 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 58.0 | Range: 204173.87865584207 | Az: 0.0 | El: 0.03290886100152157 | Rdot: -299.3650383656359
+2020-04-30 19:43:36,337 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 59.0 | Range: 203874.5140868038 | Az: 0.0 | El: 0.033004513903591715 | Rdot: -299.36409429463987
+2020-04-30 19:43:36,366 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 60.0 | Range: 203575.1504642518 | Az: 0.0 | El: 0.03310037860399628 | Rdot: -299.3631453851415
+2020-04-30 19:43:36,399 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 61.0 | Range: 203275.7877930383 | Az: 0.0 | El: 0.03319645603789301 | Rdot: -299.36219160961616
+2020-04-30 19:43:36,436 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 62.0 | Range: 202976.42607804327 | Az: 0.0 | El: 0.033292747145740265 | Rdot: -299.3612329403418
+2020-04-30 19:43:36,466 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 63.0 | Range: 202677.06532417424 | Az: 0.0 | El: 0.033389252873743835 | Rdot: -299.36026934938684
+2020-04-30 19:43:36,495 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 64.0 | Range: 202377.70553636606 | Az: 0.0 | El: 0.03348597417353716 | Rdot: -299.3593008086171
+2020-04-30 19:43:36,522 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 65.0 | Range: 202078.34671958367 | Az: 0.0 | El: 0.03358291200253927 | Rdot: -299.3583272896863
+2020-04-30 19:43:36,552 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 66.0 | Range: 201778.9888788197 | Az: 0.0 | El: 0.03368006732378248 | Rdot: -299.35734876404007
+2020-04-30 19:43:36,583 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 67.0 | Range: 201479.63201909573 | Az: 0.0 | El: 0.03377744110602077 | Rdot: -299.35636520291075
+2020-04-30 19:43:36,614 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 68.0 | Range: 201180.27614546125 | Az: 0.0 | El: 0.0338750343236871 | Rdot: -299.35537657731885
+2020-04-30 19:43:36,644 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 69.0 | Range: 200880.9212629931 | Az: 0.0 | El: 0.033972847956975194 | Rdot: -299.35438285807015
+2020-04-30 19:43:36,675 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 70.0 | Range: 200581.5673768022 | Az: 0.0 | El: 0.03407088299221517 | Rdot: -299.3533840157462
+2020-04-30 19:43:36,714 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 71.0 | Range: 200282.21449202395 | Az: 0.0 | El: 0.03416914042118968 | Rdot: -299.35238002071776
+2020-04-30 19:43:36,747 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 72.0 | Range: 199982.8626138286 | Az: 0.0 | El: 0.03426762124201499 | Rdot: -299.3513708431259
+2020-04-30 19:43:36,783 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 73.0 | Range: 199683.5117474145 | Az: 0.0 | El: 0.034366326458640906 | Rdot: -299.3503564528906
+2020-04-30 19:43:36,818 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 74.0 | Range: 199384.1618980063 | Az: 0.0 | El: 0.03446525708090853 | Rdot: -299.34933681970887
+2020-04-30 19:43:36,856 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 75.0 | Range: 199084.8130708642 | Az: 0.0 | El: 0.03456441412488598 | Rdot: -299.34831191304716
+2020-04-30 19:43:36,894 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 76.0 | Range: 198785.46527127607 | Az: 0.0 | El: 0.03466379861265256 | Rdot: -299.3472817021429
+2020-04-30 19:43:36,929 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 77.0 | Range: 198486.11850456256 | Az: 0.0 | El: 0.034763411572527936 | Rdot: -299.3462461560008
+2020-04-30 19:43:36,964 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 78.0 | Range: 198186.77277607346 | Az: 0.0 | El: 0.03486325403894153 | Rdot: -299.34520524339376
+2020-04-30 19:43:36,999 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 79.0 | Range: 197887.42809119137 | Az: 0.0 | El: 0.03496332705260752 | Rdot: -299.3441589328573
+2020-04-30 19:43:37,033 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 80.0 | Range: 197588.08445533033 | Az: 0.0 | El: 0.03506363166064563 | Rdot: -299.3431071926869
+2020-04-30 19:43:37,067 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 81.0 | Range: 197288.7418739354 | Az: 0.0 | El: 0.03516416891628449 | Rdot: -299.34204999094106
+2020-04-30 19:43:37,105 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 82.0 | Range: 196989.40035248463 | Az: 0.0 | El: 0.03526493987935719 | Rdot: -299.34098729543376
+2020-04-30 19:43:37,144 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 83.0 | Range: 196690.05989648972 | Az: 0.0 | El: 0.035365945616164574 | Rdot: -299.33991907373195
+2020-04-30 19:43:37,179 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 84.0 | Range: 196390.7205114893 | Az: 0.0 | El: 0.035467187199175854 | Rdot: -299.33884529316225
+2020-04-30 19:43:37,223 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 85.0 | Range: 196091.3822030619 | Az: 0.0 | El: 0.03556866570775519 | Rdot: -299.3377659207953
+2020-04-30 19:43:37,262 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 86.0 | Range: 195792.04497681584 | Az: 0.0 | El: 0.035670382227860564 | Rdot: -299.3366809234497
+2020-04-30 19:43:37,302 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 87.0 | Range: 195492.70883838853 | Az: 0.0 | El: 0.03577233785149403 | Rdot: -299.3355902677017
+2020-04-30 19:43:37,339 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 88.0 | Range: 195193.37379345935 | Az: 0.0 | El: 0.035874533678152076 | Rdot: -299.3344939198566
+2020-04-30 19:43:37,378 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 89.0 | Range: 194894.0398477362 | Az: 0.0 | El: 0.03597697081367546 | Rdot: -299.3333918459673
+2020-04-30 19:43:37,418 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 90.0 | Range: 194594.70700696114 | Az: 0.0 | El: 0.03607965037062488 | Rdot: -299.3322840118284
+2020-04-30 19:43:37,456 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 91.0 | Range: 194295.37527691512 | Az: 0.0 | El: 0.03618257346880416 | Rdot: -299.3311703829625
+2020-04-30 19:43:37,497 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 92.0 | Range: 193996.0446634069 | Az: 0.0 | El: 0.03628574123435779 | Rdot: -299.3300509246381
+2020-04-30 19:43:37,537 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 93.0 | Range: 193696.7151722844 | Az: 0.0 | El: 0.03638915480077731 | Rdot: -299.3289256018471
+2020-04-30 19:43:37,610 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 94.0 | Range: 193397.38680942814 | Az: 0.0 | El: 0.03649281530830972 | Rdot: -299.32779437931566
+2020-04-30 19:43:37,650 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 95.0 | Range: 193098.05958075766 | Az: 0.0 | El: 0.03659672390459612 | Rdot: -299.32665722149017
+2020-04-30 19:43:37,707 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 96.0 | Range: 192798.73349222547 | Az: 0.0 | El: 0.03670088174403574 | Rdot: -299.32551409254785
+2020-04-30 19:43:37,751 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 97.0 | Range: 192499.40854982176 | Az: 0.0 | El: 0.03680528998853916 | Rdot: -299.32436495638166
+2020-04-30 19:43:37,797 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 98.0 | Range: 192200.08475956996 | Az: 0.0 | El: 0.0369099498068266 | Rdot: -299.32320977661004
+2020-04-30 19:43:37,841 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 99.0 | Range: 191900.76212753347 | Az: 0.0 | El: 0.03701486237527263 | Rdot: -299.32204851656275
+2020-04-30 19:43:37,884 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 100.0 | Range: 191601.44065981105 | Az: 0.0 | El: 0.03712002887739896 | Rdot: -299.32088113928467
+2020-04-30 19:43:37,927 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 101.0 | Range: 191302.12036253788 | Az: 0.0 | El: 0.03722545050416315 | Rdot: -299.3197076075331
+2020-04-30 19:43:37,972 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 102.0 | Range: 191002.8012418877 | Az: 0.0 | El: 0.03733112845401898 | Rdot: -299.31852788377086
+2020-04-30 19:43:38,017 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 103.0 | Range: 190703.4833040707 | Az: 0.0 | El: 0.03743706393282498 | Rdot: -299.3173419301699
+2020-04-30 19:43:38,063 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 104.0 | Range: 190404.16655533607 | Az: 0.0 | El: 0.03754325815402737 | Rdot: -299.31614970860375
+2020-04-30 19:43:38,108 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 105.0 | Range: 190104.8510019698 | Az: 0.0 | El: 0.03764971233875336 | Rdot: -299.3149511806451
+2020-04-30 19:43:38,153 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 106.0 | Range: 189805.53665029953 | Az: 0.0 | El: 0.037756427715874175 | Rdot: -299.3137463075632
+2020-04-30 19:43:38,198 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 107.0 | Range: 189506.22350668893 | Az: 0.0 | El: 0.037863405521894045 | Rdot: -299.31253505032333
+2020-04-30 19:43:38,247 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 108.0 | Range: 189206.9115775412 | Az: 0.0 | El: 0.037970647001224656 | Rdot: -299.31131736958054
+2020-04-30 19:43:38,294 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 109.0 | Range: 188907.6008693017 | Az: 0.0 | El: 0.03807815340612919 | Rdot: -299.3100932256781
+2020-04-30 19:43:38,339 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 110.0 | Range: 188608.29138845127 | Az: 0.0 | El: 0.038185925996698344 | Rdot: -299.3088625786485
+2020-04-30 19:43:38,384 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 111.0 | Range: 188308.98314151386 | Az: 0.0 | El: 0.03829396604114432 | Rdot: -299.30762538820255
+2020-04-30 19:43:38,430 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 112.0 | Range: 188009.6761350542 | Az: 0.0 | El: 0.03840227481577241 | Rdot: -299.30638161373105
+2020-04-30 19:43:38,480 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 113.0 | Range: 187710.3703756762 | Az: 0.0 | El: 0.03851085360491968 | Rdot: -299.3051312143025
+2020-04-30 19:43:38,529 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 114.0 | Range: 187411.06587002455 | Az: 0.0 | El: 0.038619703701045616 | Rdot: -299.3038741486604
+2020-04-30 19:43:38,578 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 115.0 | Range: 187111.76262478757 | Az: 0.0 | El: 0.03872882640507047 | Rdot: -299.3026103752141
+2020-04-30 19:43:38,628 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 116.0 | Range: 186812.46064669138 | Az: 0.0 | El: 0.038838223025898344 | Rdot: -299.30133985204714
+2020-04-30 19:43:38,675 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 117.0 | Range: 186513.15994250998 | Az: 0.0 | El: 0.03894789488126271 | Rdot: -299.3000625368973
+2020-04-30 19:43:38,723 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 118.0 | Range: 186213.8605190544 | Az: 0.0 | El: 0.03905784329695905 | Rdot: -299.29877838717124
+2020-04-30 19:43:38,772 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 119.0 | Range: 185914.5623831819 | Az: 0.0 | El: 0.039168069607620204 | Rdot: -299.29748735992746
+2020-04-30 19:43:38,824 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 120.0 | Range: 185615.2655417914 | Az: 0.0 | El: 0.039278575156329154 | Rdot: -299.2961894118797
+2020-04-30 19:43:38,876 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 121.0 | Range: 185315.97000182534 | Az: 0.0 | El: 0.03938936129479931 | Rdot: -299.29488449939396
+2020-04-30 19:43:38,926 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 122.0 | Range: 185016.67577027023 | Az: 0.0 | El: 0.039500429383460656 | Rdot: -299.2935725784839
+2020-04-30 19:43:38,979 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 123.0 | Range: 184717.38285415637 | Az: 0.0 | El: 0.039611780791658724 | Rdot: -299.2922536048039
+2020-04-30 19:43:39,039 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 124.0 | Range: 184418.0912605562 | Az: 0.0 | El: 0.03972341689725045 | Rdot: -299.2909275336568
+2020-04-30 19:43:39,091 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 125.0 | Range: 184118.8009965955 | Az: 0.0 | El: 0.03983533908781123 | Rdot: -299.28959431996674
+2020-04-30 19:43:39,144 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 126.0 | Range: 183819.51206943602 | Az: 0.0 | El: 0.03994754875918005 | Rdot: -299.2882539183051
+2020-04-30 19:43:39,205 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 127.0 | Range: 183520.22448628856 | Az: 0.0 | El: 0.04006004731653867 | Rdot: -299.2869062828698
+2020-04-30 19:43:39,257 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 128.0 | Range: 183220.9382544103 | Az: 0.0 | El: 0.04017283617424994 | Rdot: -299.28555136748327
+2020-04-30 19:43:39,310 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 129.0 | Range: 182921.65338110417 | Az: 0.0 | El: 0.040285916755995466 | Rdot: -299.28418912558914
+2020-04-30 19:43:39,363 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 130.0 | Range: 182622.3698737209 | Az: 0.0 | El: 0.04039929049458468 | Rdot: -299.2828195102535
+2020-04-30 19:43:39,420 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 131.0 | Range: 182323.0877396557 | Az: 0.0 | El: 0.04051295883230477 | Rdot: -299.28144247415594
+2020-04-30 19:43:39,472 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 132.0 | Range: 182023.8069863557 | Az: 0.0 | El: 0.04062692322105654 | Rdot: -299.280057969584
+2020-04-30 19:43:39,534 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 133.0 | Range: 181724.52762131096 | Az: 0.0 | El: 0.04074118512198144 | Rdot: -299.27866594843874
+2020-04-30 19:43:39,589 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 134.0 | Range: 181425.24965206516 | Az: 0.0 | El: 0.04085574600621644 | Rdot: -299.27726636221746
+2020-04-30 19:43:39,643 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 135.0 | Range: 181125.97308620554 | Az: 0.0 | El: 0.04097060735424751 | Rdot: -299.2758591620244
+2020-04-30 19:43:39,700 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 136.0 | Range: 180826.6979313718 | Az: 0.0 | El: 0.041085770656668075 | Rdot: -299.2744442985516
+2020-04-30 19:43:39,757 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 137.0 | Range: 180527.42419525157 | Az: 0.0 | El: 0.041201237413655 | Rdot: -299.2730217220904
+2020-04-30 19:43:39,813 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 138.0 | Range: 180228.15188558216 | Az: 0.0 | El: 0.04131700913535763 | Rdot: -299.27159138251704
+2020-04-30 19:43:39,872 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 139.0 | Range: 179928.88101015257 | Az: 0.0 | El: 0.04143308734210738 | Rdot: -299.2701532292894
+2020-04-30 19:43:39,929 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 140.0 | Range: 179629.61157680195 | Az: 0.0 | El: 0.04154947356431471 | Rdot: -299.2687072114446
+2020-04-30 19:43:39,986 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 141.0 | Range: 179330.34359342055 | Az: 0.0 | El: 0.041666169342471804 | Rdot: -299.26725327759783
+2020-04-30 19:43:40,051 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 142.0 | Range: 179031.07706795068 | Az: 0.0 | El: 0.041783176227516705 | Rdot: -299.26579137593086
+2020-04-30 19:43:40,108 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 143.0 | Range: 178731.81200838333 | Az: 0.0 | El: 0.04190049578041677 | Rdot: -299.264321454199
+2020-04-30 19:43:40,169 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 144.0 | Range: 178432.5484227692 | Az: 0.0 | El: 0.042018129573170526 | Rdot: -299.2628434597085
+2020-04-30 19:43:40,228 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 145.0 | Range: 178133.28631920525 | Az: 0.0 | El: 0.042136079187857334 | Rdot: -299.2613573393321
+2020-04-30 19:43:40,291 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 146.0 | Range: 177834.02570584367 | Az: 0.0 | El: 0.042254346217240446 | Rdot: -299.25986303949475
+2020-04-30 19:43:40,354 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 147.0 | Range: 177534.76659089097 | Az: 0.0 | El: 0.042372932264846064 | Rdot: -299.25836050616954
+2020-04-30 19:43:40,415 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 148.0 | Range: 177235.50898260853 | Az: 0.0 | El: 0.04249183894508857 | Rdot: -299.25684968487167
+2020-04-30 19:43:40,474 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 149.0 | Range: 176936.2528893129 | Az: 0.0 | El: 0.04261106788331226 | Rdot: -299.2553305206557
+2020-04-30 19:43:40,539 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 150.0 | Range: 176636.9983193729 | Az: 0.0 | El: 0.042730620715685674 | Rdot: -299.2538029581142
+2020-04-30 19:43:40,601 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 151.0 | Range: 176337.7452812158 | Az: 0.0 | El: 0.04285049908959149 | Rdot: -299.2522669413675
+2020-04-30 19:43:40,666 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 152.0 | Range: 176038.4937833233 | Az: 0.0 | El: 0.04297070466352082 | Rdot: -299.2507224140624
+2020-04-30 19:43:40,729 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 153.0 | Range: 175739.2438342346 | Az: 0.0 | El: 0.043091239107213575 | Rdot: -299.249169319367
+2020-04-30 19:43:40,793 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 154.0 | Range: 175439.99544254463 | Az: 0.0 | El: 0.04321210410177123 | Rdot: -299.24760759996565
+2020-04-30 19:43:40,855 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 155.0 | Range: 175140.7486169079 | Az: 0.0 | El: 0.04333330133995705 | Rdot: -299.2460371980478
+2020-04-30 19:43:40,921 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 156.0 | Range: 174841.50336603628 | Az: 0.0 | El: 0.04345483252592164 | Rdot: -299.24445805531377
+2020-04-30 19:43:40,983 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 157.0 | Range: 174542.25969869946 | Az: 0.0 | El: 0.04357669937543118 | Rdot: -299.24287011296514
+2020-04-30 19:43:41,057 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 158.0 | Range: 174243.01762372878 | Az: 0.0 | El: 0.04369890361625739 | Rdot: -299.24127331169313
+2020-04-30 19:43:41,122 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 159.0 | Range: 173943.77715001 | Az: 0.0 | El: 0.04382144698770496 | Rdot: -299.239667591687
+2020-04-30 19:43:41,187 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 160.0 | Range: 173644.5382864927 | Az: 0.0 | El: 0.04394433124121999 | Rdot: -299.2380528926164
+2020-04-30 19:43:41,253 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 161.0 | Range: 173345.30104218546 | Az: 0.0 | El: 0.044067558140238106 | Rdot: -299.2364291536334
+2020-04-30 19:43:41,318 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 162.0 | Range: 173046.06542616084 | Az: 0.0 | El: 0.0441911294605557 | Rdot: -299.2347963133593
+2020-04-30 19:43:41,386 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 163.0 | Range: 172746.83144755082 | Az: 0.0 | El: 0.04431504699012834 | Rdot: -299.2331543098873
+2020-04-30 19:43:41,454 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 164.0 | Range: 172447.59911554796 | Az: 0.0 | El: 0.04443931252920841 | Rdot: -299.2315030807756
+2020-04-30 19:43:41,529 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 165.0 | Range: 172148.36843941154 | Az: 0.0 | El: 0.04456392789071373 | Rdot: -299.2298425630362
+2020-04-30 19:43:41,597 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 166.0 | Range: 171849.13942846135 | Az: 0.0 | El: 0.0446888949000277 | Rdot: -299.22817269313646
+2020-04-30 19:43:41,664 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 167.0 | Range: 171549.9120920811 | Az: 0.0 | El: 0.044814215395290624 | Rdot: -299.2264934069879
+2020-04-30 19:43:41,732 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 168.0 | Range: 171250.6864397199 | Az: 0.0 | El: 0.0449398912274388 | Rdot: -299.22480463994464
+2020-04-30 19:43:41,802 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 169.0 | Range: 170951.46248089004 | Az: 0.0 | El: 0.04506592426029421 | Rdot: -299.2231063267954
+2020-04-30 19:43:41,872 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 170.0 | Range: 170652.24022517054 | Az: 0.0 | El: 0.04519231637080523 | Rdot: -299.221398401756
+2020-04-30 19:43:41,942 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 171.0 | Range: 170353.0196822067 | Az: 0.0 | El: 0.04531906944908215 | Rdot: -299.21968079846476
+2020-04-30 19:43:42,016 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 172.0 | Range: 170053.8008617097 | Az: 0.0 | El: 0.0454461853983501 | Rdot: -299.21795344998077
+2020-04-30 19:43:42,088 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 173.0 | Range: 169754.5837734603 | Az: 0.0 | El: 0.045573666135607205 | Rdot: -299.2162162887644
+2020-04-30 19:43:42,158 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 174.0 | Range: 169455.36842730286 | Az: 0.0 | El: 0.0457015135908545 | Rdot: -299.2144692466917
+2020-04-30 19:43:42,231 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 175.0 | Range: 169156.1548331545 | Az: 0.0 | El: 0.04582972970821686 | Rdot: -299.2127122550256
+2020-04-30 19:43:42,304 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 176.0 | Range: 168856.94300099806 | Az: 0.0 | El: 0.04595831644508497 | Rdot: -299.21094524443134
+2020-04-30 19:43:42,376 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 177.0 | Range: 168557.73294088733 | Az: 0.0 | El: 0.04608727577299643 | Rdot: -299.2091681449527
+2020-04-30 19:43:42,448 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 178.0 | Range: 168258.5246629465 | Az: 0.0 | El: 0.046216609677459 | Rdot: -299.20738088601297
+2020-04-30 19:43:42,527 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 179.0 | Range: 167959.31817737228 | Az: 0.0 | El: 0.046346320158159315 | Rdot: -299.2055833964055
+2020-04-30 19:43:42,600 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 180.0 | Range: 167660.11349443055 | Az: 0.0 | El: 0.04647640922892915 | Rdot: -299.20377560429074
+2020-04-30 19:43:42,674 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 181.0 | Range: 167360.91062445985 | Az: 0.0 | El: 0.046606878917916816 | Rdot: -299.20195743718966
+2020-04-30 19:43:42,748 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 182.0 | Range: 167061.70957787015 | Az: 0.0 | El: 0.046737731267725735 | Rdot: -299.2001288219746
+2020-04-30 19:43:42,822 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 183.0 | Range: 166762.5103651484 | Az: 0.0 | El: 0.046868968335835426 | Rdot: -299.19828968485695
+2020-04-30 19:43:42,899 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 184.0 | Range: 166463.31299685215 | Az: 0.0 | El: 0.047000592194199164 | Rdot: -299.1964399513924
+2020-04-30 19:43:42,973 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 185.0 | Range: 166164.1174836153 | Az: 0.0 | El: 0.0471326049298586 | Rdot: -299.19457954646214
+2020-04-30 19:43:43,051 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 186.0 | Range: 165864.9238361491 | Az: 0.0 | El: 0.04726500864491712 | Rdot: -299.1927083942695
+2020-04-30 19:43:43,128 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 187.0 | Range: 165565.73206523637 | Az: 0.0 | El: 0.04739780545633465 | Rdot: -299.1908264183408
+2020-04-30 19:43:43,202 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 188.0 | Range: 165266.54218174127 | Az: 0.0 | El: 0.047530997496723515 | Rdot: -299.1889335415022
+2020-04-30 19:43:43,281 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 189.0 | Range: 164967.3541966016 | Az: 0.0 | El: 0.04766458691374531 | Rdot: -299.18702968588894
+2020-04-30 19:43:43,360 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 190.0 | Range: 164668.16812083666 | Az: 0.0 | El: 0.04779857587105951 | Rdot: -299.1851147729207
+2020-04-30 19:43:43,438 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 191.0 | Range: 164368.98396554298 | Az: 0.0 | El: 0.04793296654772128 | Rdot: -299.18318872330974
+2020-04-30 19:43:43,519 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 192.0 | Range: 164069.80174189818 | Az: 0.0 | El: 0.04806776113891775 | Rdot: -299.18125145704005
+2020-04-30 19:43:43,596 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 193.0 | Range: 163770.62146115786 | Az: 0.0 | El: 0.048202961855489335 | Rdot: -299.1793028933719
+2020-04-30 19:43:43,682 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 194.0 | Range: 163471.44313466173 | Az: 0.0 | El: 0.04833857092474947 | Rdot: -299.1773429508214
+2020-04-30 19:43:43,765 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 195.0 | Range: 163172.2667738279 | Az: 0.0 | El: 0.048474590590055655 | Rdot: -299.1753715471634
+2020-04-30 19:43:43,845 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 196.0 | Range: 162873.09239015976 | Az: 0.0 | El: 0.04861102311133969 | Rdot: -299.17338859941555
+2020-04-30 19:43:43,924 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 197.0 | Range: 162573.9199952447 | Az: 0.0 | El: 0.048747870765241785 | Rdot: -299.17139402382986
+2020-04-30 19:43:44,006 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 198.0 | Range: 162274.74960075016 | Az: 0.0 | El: 0.048885135844908056 | Rdot: -299.16938773589254
+2020-04-30 19:43:44,089 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 199.0 | Range: 161975.58121843185 | Az: 0.0 | El: 0.049022820660402644 | Rdot: -299.16736965031004
+2020-04-30 19:43:44,169 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 200.0 | Range: 161676.41486013014 | Az: 0.0 | El: 0.04916092753896528 | Rdot: -299.16533968099674
+2020-04-30 19:43:44,254 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 201.0 | Range: 161377.25053777188 | Az: 0.0 | El: 0.04929945882498554 | Rdot: -299.16329774107226
+2020-04-30 19:43:44,339 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 202.0 | Range: 161078.08826337242 | Az: 0.0 | El: 0.04943841688040962 | Rdot: -299.16124374284556
+2020-04-30 19:43:44,423 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 203.0 | Range: 160778.9280490357 | Az: 0.0 | El: 0.0495778040846 | Rdot: -299.1591775978136
+2020-04-30 19:43:44,508 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 204.0 | Range: 160479.7699069503 | Az: 0.0 | El: 0.0497176228343994 | Rdot: -299.1570992166535
+2020-04-30 19:43:44,592 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 205.0 | Range: 160180.61384939722 | Az: 0.0 | El: 0.04985787554464505 | Rdot: -299.1550085092066
+2020-04-30 19:43:44,676 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 206.0 | Range: 159881.45988875156 | Az: 0.0 | El: 0.049998564648514154 | Rdot: -299.1529053844641
+2020-04-30 19:43:44,761 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 207.0 | Range: 159582.30803747324 | Az: 0.0 | El: 0.05013969259695816 | Rdot: -299.15078975057486
+2020-04-30 19:43:44,845 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 208.0 | Range: 159283.15830811943 | Az: 0.0 | El: 0.05028126185953141 | Rdot: -299.14866151482056
+2020-04-30 19:43:44,928 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 209.0 | Range: 158984.010713336 | Az: 0.0 | El: 0.05042327492402521 | Rdot: -299.14652058361844
+2020-04-30 19:43:45,017 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 210.0 | Range: 158684.8652658685 | Az: 0.0 | El: 0.0505657342974386 | Rdot: -299.1443668624932
+2020-04-30 19:43:45,102 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 211.0 | Range: 158385.72197855386 | Az: 0.0 | El: 0.050708642505330026 | Rdot: -299.1422002560851
+2020-04-30 19:43:45,187 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 212.0 | Range: 158086.58086432406 | Az: 0.0 | El: 0.050852002092245385 | Rdot: -299.1400206681363
+2020-04-30 19:43:45,273 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 213.0 | Range: 157787.44193621096 | Az: 0.0 | El: 0.0509958156222865 | Rdot: -299.137828001469
+2020-04-30 19:43:45,389 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 214.0 | Range: 157488.3052073421 | Az: 0.0 | El: 0.05114008567874251 | Rdot: -299.1356221579895
+2020-04-30 19:43:45,476 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 215.0 | Range: 157189.17069094186 | Az: 0.0 | El: 0.05128481486449754 | Rdot: -299.13340303867244
+2020-04-30 19:43:45,565 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 216.0 | Range: 156890.03840033693 | Az: 0.0 | El: 0.0514300058024002 | Rdot: -299.131170543545
+2020-04-30 19:43:45,652 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 217.0 | Range: 156590.9083489533 | Az: 0.0 | El: 0.05157566113519163 | Rdot: -299.1289245716828
+2020-04-30 19:43:45,740 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 218.0 | Range: 156291.78055031758 | Az: 0.0 | El: 0.051721783525700005 | Rdot: -299.12666502119885
+2020-04-30 19:43:45,829 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 219.0 | Range: 155992.65501806265 | Az: 0.0 | El: 0.05186837565750135 | Rdot: -299.12439178922165
+2020-04-30 19:43:45,920 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 220.0 | Range: 155693.53176591912 | Az: 0.0 | El: 0.05201544023421789 | Rdot: -299.1221047719044
+2020-04-30 19:43:46,015 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 221.0 | Range: 155394.41080772664 | Az: 0.0 | El: 0.05216297998067976 | Rdot: -299.1198038643921
+2020-04-30 19:43:46,105 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 222.0 | Range: 155095.29215742683 | Az: 0.0 | El: 0.05231099764230507 | Rdot: -299.11748896082736
+2020-04-30 19:43:46,194 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 223.0 | Range: 154796.17582906983 | Az: 0.0 | El: 0.052459495985888616 | Rdot: -299.1151599543269
+2020-04-30 19:43:46,284 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 224.0 | Range: 154497.06183681302 | Az: 0.0 | El: 0.05260847779969691 | Rdot: -299.1128167369711
+2020-04-30 19:43:46,378 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 225.0 | Range: 154197.95019492076 | Az: 0.0 | El: 0.05275794589340688 | Rdot: -299.11045919979927
+2020-04-30 19:43:46,472 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 226.0 | Range: 153898.8409177665 | Az: 0.0 | El: 0.05290790309832172 | Rdot: -299.1080872327957
+2020-04-30 19:43:46,564 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 227.0 | Range: 153599.73401983888 | Az: 0.0 | El: 0.05305835226823419 | Rdot: -299.10570072486433
+2020-04-30 19:43:46,656 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 228.0 | Range: 153300.62951573293 | Az: 0.0 | El: 0.0532092962785633 | Rdot: -299.10329956383856
+2020-04-30 19:43:46,748 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 229.0 | Range: 153001.5274201558 | Az: 0.0 | El: 0.05336073802732688 | Rdot: -299.10088363645355
+2020-04-30 19:43:46,843 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 230.0 | Range: 152702.42774793395 | Az: 0.0 | El: 0.053512680435488846 | Rdot: -299.09845282832936
+2020-04-30 19:43:46,936 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 231.0 | Range: 152403.3305140046 | Az: 0.0 | El: 0.053665126446614586 | Rdot: -299.09600702397057
+2020-04-30 19:43:47,039 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 232.0 | Range: 152104.2357334213 | Az: 0.0 | El: 0.05381807902729818 | Rdot: -299.0935461067492
+2020-04-30 19:43:47,134 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 233.0 | Range: 151805.14342135837 | Az: 0.0 | El: 0.053971541167816994 | Rdot: -299.0910699588812
+2020-04-30 19:43:47,232 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 234.0 | Range: 151506.05359310372 | Az: 0.0 | El: 0.05412551588149306 | Rdot: -299.08857846143263
+2020-04-30 19:43:47,325 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 235.0 | Range: 151206.9662640671 | Az: 0.0 | El: 0.054280006205796205 | Rdot: -299.0860714942851
+2020-04-30 19:43:47,421 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 236.0 | Range: 150907.88144978072 | Az: 0.0 | El: 0.05443501520208738 | Rdot: -299.0835489361357
+2020-04-30 19:43:47,518 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 237.0 | Range: 150608.79916589346 | Az: 0.0 | El: 0.05459054595579094 | Rdot: -299.08101066448194
+2020-04-30 19:43:47,615 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 238.0 | Range: 150309.7194281822 | Az: 0.0 | El: 0.054746601577108756 | Rdot: -299.07845655559726
+2020-04-30 19:43:47,713 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 239.0 | Range: 150010.6422525481 | Az: 0.0 | El: 0.05490318520099535 | Rdot: -299.0758864845225
+2020-04-30 19:43:47,810 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 240.0 | Range: 149711.56765501518 | Az: 0.0 | El: 0.05506029998710016 | Rdot: -299.0733003250587
+2020-04-30 19:43:47,908 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 241.0 | Range: 149412.49565173456 | Az: 0.0 | El: 0.05521794912040523 | Rdot: -299.07069794974285
+2020-04-30 19:43:48,007 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 242.0 | Range: 149113.426258987 | Az: 0.0 | El: 0.0553761358114091 | Rdot: -299.0680792298336
+2020-04-30 19:43:48,105 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 243.0 | Range: 148814.35949318093 | Az: 0.0 | El: 0.055534863296295534 | Rdot: -299.06544403529983
+2020-04-30 19:43:48,204 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 244.0 | Range: 148515.29537085685 | Az: 0.0 | El: 0.05569413483724617 | Rdot: -299.0627922348017
+2020-04-30 19:43:48,312 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 245.0 | Range: 148216.2339086883 | Az: 0.0 | El: 0.05585395372291124 | Rdot: -299.0601236956709
+2020-04-30 19:43:48,410 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 246.0 | Range: 147917.17512348064 | Az: 0.0 | El: 0.05601432326812805 | Rdot: -299.05743828390786
+2020-04-30 19:43:48,509 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 247.0 | Range: 147618.11903217313 | Az: 0.0 | El: 0.056175246814670565 | Rdot: -299.0547358641532
+2020-04-30 19:43:48,610 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 248.0 | Range: 147319.06565184126 | Az: 0.0 | El: 0.05633672773129206 | Rdot: -299.05201629967706
+2020-04-30 19:43:48,712 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 249.0 | Range: 147020.01499970007 | Az: 0.0 | El: 0.05649876941426424 | Rdot: -299.0492794523569
+2020-04-30 19:43:48,813 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 250.0 | Range: 146720.96709310313 | Az: 0.0 | El: 0.056661375287378135 | Rdot: -299.04652518266545
+2020-04-30 19:43:48,914 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 251.0 | Range: 146421.9219495425 | Az: 0.0 | El: 0.05682454880223542 | Rdot: -299.04375334965437
+2020-04-30 19:43:49,019 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 252.0 | Range: 146122.87958664997 | Az: 0.0 | El: 0.05698829343832035 | Rdot: -299.0409638109422
+2020-04-30 19:43:49,121 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 253.0 | Range: 145823.84002220436 | Az: 0.0 | El: 0.05715261270410288 | Rdot: -299.03815642267625
+2020-04-30 19:43:49,225 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 254.0 | Range: 145524.80327412827 | Az: 0.0 | El: 0.05731751013666919 | Rdot: -299.03533103953094
+2020-04-30 19:43:49,327 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 255.0 | Range: 145225.76936048857 | Az: 0.0 | El: 0.057482989301795406 | Rdot: -299.0324875146955
+2020-04-30 19:43:49,434 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 256.0 | Range: 144926.73829950433 | Az: 0.0 | El: 0.05764905379527452 | Rdot: -299.02962569982947
+2020-04-30 19:43:49,536 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 257.0 | Range: 144627.71010953697 | Az: 0.0 | El: 0.05781570724174134 | Rdot: -299.0267454450801
+2020-04-30 19:43:49,642 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 258.0 | Range: 144328.68480910244 | Az: 0.0 | El: 0.05798295329630143 | Rdot: -299.02384659903254
+2020-04-30 19:43:49,746 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 259.0 | Range: 144029.662416871 | Az: 0.0 | El: 0.058150795644319686 | Rdot: -299.0209290087013
+2020-04-30 19:43:49,856 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 260.0 | Range: 143730.64295166134 | Az: 0.0 | El: 0.05831923800145766 | Rdot: -299.01799251951877
+2020-04-30 19:43:49,960 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 261.0 | Range: 143431.62643245028 | Az: 0.0 | El: 0.05848828411427043 | Rdot: -299.01503697530796
+2020-04-30 19:43:50,071 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 262.0 | Range: 143132.6128783717 | Az: 0.0 | El: 0.05865793776070216 | Rdot: -299.01206221825845
+2020-04-30 19:43:50,177 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 263.0 | Range: 142833.6023087186 | Az: 0.0 | El: 0.058828202750281555 | Rdot: -299.0090680889091
+2020-04-30 19:43:50,280 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 264.0 | Range: 142534.59474294298 | Az: 0.0 | El: 0.05899908292417866 | Rdot: -299.00605442613335
+2020-04-30 19:43:50,394 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 265.0 | Range: 142235.59020066162 | Az: 0.0 | El: 0.05917058215605664 | Rdot: -299.00302106710694
+2020-04-30 19:43:50,501 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 266.0 | Range: 141936.58870165216 | Az: 0.0 | El: 0.059342704351919906 | Rdot: -298.99996784729694
+2020-04-30 19:43:50,610 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 267.0 | Range: 141637.59026585723 | Az: 0.0 | El: 0.05951545345049425 | Rdot: -298.9968946004403
+2020-04-30 19:43:50,719 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 268.0 | Range: 141338.59491338886 | Az: 0.0 | El: 0.059688833423965804 | Rdot: -298.99380115851164
+2020-04-30 19:43:50,831 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 269.0 | Range: 141039.60266452568 | Az: 0.0 | El: 0.05986284827799704 | Rdot: -298.99068735170994
+2020-04-30 19:43:50,941 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 270.0 | Range: 140740.61353971704 | Az: 0.0 | El: 0.060037502052014524 | Rdot: -298.9875530084366
+2020-04-30 19:43:51,053 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 271.0 | Range: 140441.62755958876 | Az: 0.0 | El: 0.06021279882014685 | Rdot: -298.9843979552585
+2020-04-30 19:43:51,161 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 272.0 | Range: 140142.64474493795 | Az: 0.0 | El: 0.060388742690991926 | Rdot: -298.98122201690103
+2020-04-30 19:43:51,273 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 273.0 | Range: 139843.6651167366 | Az: 0.0 | El: 0.060565337807916286 | Rdot: -298.9780250162229
+2020-04-30 19:43:51,386 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 274.0 | Range: 139544.6886961372 | Az: 0.0 | El: 0.06074258834994417 | Rdot: -298.97480677418224
+2020-04-30 19:43:51,496 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 275.0 | Range: 139245.71550447238 | Az: 0.0 | El: 0.06092049853185877 | Rdot: -298.9715671098186
+2020-04-30 19:43:51,608 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 276.0 | Range: 138946.74556325233 | Az: 0.0 | El: 0.06109907260424663 | Rdot: -298.9683058402353
+2020-04-30 19:43:51,726 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 277.0 | Range: 138647.77889417842 | Az: 0.0 | El: 0.061278314854832594 | Rdot: -298.96502278055243
+2020-04-30 19:43:51,841 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 278.0 | Range: 138348.81551913204 | Az: 0.0 | El: 0.06145822960782876 | Rdot: -298.9617177439055
+2020-04-30 19:43:51,952 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 279.0 | Range: 138049.8554601844 | Az: 0.0 | El: 0.061638821224826223 | Rdot: -298.95839054141015
+2020-04-30 19:43:52,066 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 280.0 | Range: 137750.89873959788 | Az: 0.0 | El: 0.06182009410545408 | Rdot: -298.95504098212626
+2020-04-30 19:43:52,178 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 281.0 | Range: 137451.94537982266 | Az: 0.0 | El: 0.06200205268688119 | Rdot: -298.95166887305646
+2020-04-30 19:43:52,289 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 282.0 | Range: 137152.99540350938 | Az: 0.0 | El: 0.06218470144555255 | Rdot: -298.94827401908475
+2020-04-30 19:43:52,408 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 283.0 | Range: 136854.04883349978 | Az: 0.0 | El: 0.06236804489642811 | Rdot: -298.9448562229788
+2020-04-30 19:43:52,523 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 284.0 | Range: 136555.10569283442 | Az: 0.0 | El: 0.06255208759380171 | Rdot: -298.94141528535215
+2020-04-30 19:43:52,640 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 285.0 | Range: 136256.16600475795 | Az: 0.0 | El: 0.06273683413224429 | Rdot: -298.93795100462404
+2020-04-30 19:43:52,754 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 286.0 | Range: 135957.22979271293 | Az: 0.0 | El: 0.06292228914614029 | Rdot: -298.93446317701137
+2020-04-30 19:43:52,873 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 287.0 | Range: 135658.29708034932 | Az: 0.0 | El: 0.06310845731076231 | Rdot: -298.930951596485
+2020-04-30 19:43:52,988 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 288.0 | Range: 135359.36789152562 | Az: 0.0 | El: 0.06329534334262821 | Rdot: -298.92741605474225
+2020-04-30 19:43:53,104 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 289.0 | Range: 135060.44225030343 | Az: 0.0 | El: 0.06348295199936782 | Rdot: -298.92385634119114
+2020-04-30 19:43:53,222 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 290.0 | Range: 134761.5201809672 | Az: 0.0 | El: 0.06367128808164058 | Rdot: -298.9202722428839
+2020-04-30 19:43:53,338 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 291.0 | Range: 134462.60170800707 | Az: 0.0 | El: 0.06386035643185206 | Rdot: -298.91666354452843
+2020-04-30 19:43:53,457 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 292.0 | Range: 134163.68685613145 | Az: 0.0 | El: 0.06405016193554314 | Rdot: -298.9130300284355
+2020-04-30 19:43:53,591 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 293.0 | Range: 133864.7756502657 | Az: 0.0 | El: 0.06424070952161287 | Rdot: -298.9093714744923
+2020-04-30 19:43:53,710 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 294.0 | Range: 133565.86811556178 | Az: 0.0 | El: 0.06443200416344652 | Rdot: -298.9056876601133
+2020-04-30 19:43:53,831 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 295.0 | Range: 133266.96427738992 | Az: 0.0 | El: 0.06462405087829204 | Rdot: -298.90197836023657
+2020-04-30 19:43:53,952 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 296.0 | Range: 132968.06416135046 | Az: 0.0 | El: 0.06481685472869536 | Rdot: -298.8982433472654
+2020-04-30 19:43:54,073 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 297.0 | Range: 132669.16779327267 | Az: 0.0 | El: 0.06501042082263009 | Rdot: -298.89448239104416
+2020-04-30 19:43:54,211 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 298.0 | Range: 132370.2751992128 | Az: 0.0 | El: 0.06520475431365558 | Rdot: -298.8906952588331
+2020-04-30 19:43:54,339 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 299.0 | Range: 132071.38640546417 | Az: 0.0 | El: 0.06539986040219592 | Rdot: -298.8868817152532
+2020-04-30 19:43:54,465 - simple_radar - 103 - DEBUG      - Sensor Radar1 Detection - Time: 300.0 | Range: 131772.50143855828 | Az: 0.0 | El: 0.06559574433561366 | Rdot: -298.88304152226124
+2020-04-30 19:43:54,465 - simple_radar - 95 - INFO       - Target Target exited scenario at time 301.0
+2020-04-30 19:43:54,467 - simple_radar - 97 - INFO       - Sensor Radar1 exited scenario at time 301.0
+2020-04-30 19:43:54,467 - sim_master - 173 - INFO       - Detection complete
+2020-04-30 19:43:54,469 - sim_master - 191 - INFO       - Writing output logs
+2020-04-30 19:43:54,469 - sim_master - 180 - INFO       - Writing measdata log to ./test/test_jobs\test_job1\measdata.csv
+2020-04-30 19:43:54,485 - sim_master - 195 - INFO       - Finished writing output logs
+2020-04-30 19:43:54,485 - sim_master - 199 - INFO       - SimMaster id 1 destructed
+2020-04-30 19:43:54,486 - simple_radar - 203 - INFO       - SimpleRadar with sensor id 1 destructed
+2020-04-30 19:43:54,486 - sensor - 68 - INFO       - Sensor id 1 destructed

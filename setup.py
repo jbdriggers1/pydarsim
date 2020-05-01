@@ -9,5 +9,14 @@ setup(
       url='https://github.com/jbdriggers1/pydarsim',
       author='John B. Driggers',
       author_email='jbdriggers1@gmail.com',
-	  zip_safe=False
+	  zip_safe=False,
+      install_requires=['numpy',
+                        'pandas',
+                        'pip',
+                        'python-dateutil',
+                        'pytz',
+                        'pyyaml',
+                        'setuptools',
+                        'six',
+                        'wheel']
       )
